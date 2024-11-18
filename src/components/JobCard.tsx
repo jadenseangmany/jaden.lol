@@ -1,3 +1,11 @@
+interface JobCardProps {
+  title: string;
+  subtitle: string;
+  gradient?: string;
+  buttonStyle?: string;
+  children?: React.ReactNode;
+}
+
 export default function JobCard({
   title,
   subtitle,
