@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+.title-text {
+  font-size: 55px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.subtitle-text {
+  font-size: 28px;
+  font-weight: 400; /* Regular */
+  line-height: 1.5; /* Optional for better spacing */
+  text-align: center;
+}
+
 @font-face {
     font-family: 'SF Pro';
     src: url('/fonts/sf-pro-text-regular.woff') format('woff');

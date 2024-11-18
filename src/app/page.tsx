@@ -16,7 +16,7 @@ export default function Home() {
         <div className="bg-blue-100 p-6 rounded-lg">
           <h3 className="text-xl font-bold">Outreach Instructor</h3>
           <p className="mt-2">Eta Kappa Nu @ UCSD</p>
-          <button className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-full">
+          <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-full">
             Learn more
           </button>
         </div>
@@ -25,7 +25,7 @@ export default function Home() {
         <div className="bg-black text-white p-6 rounded-lg">
           <h3 className="text-xl font-bold">Roblox Autofarm</h3>
           <p className="mt-2">Project @ V3million</p>
-          <button className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-full">
+          <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-full">
             Learn more
           </button>
         </div>
@@ -34,7 +34,7 @@ export default function Home() {
         <div className="bg-white-100 p-6 rounded-lg">
           <h3 className="text-xl font-bold">Mathlab Tutor</h3>
           <p className="mt-2">ASC @ Miramar College</p>
-          <button className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-full">
+          <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-full">
             Learn more
           </button>
         </div>
@@ -43,7 +43,7 @@ export default function Home() {
         <div className="bg-black text-white p-6 rounded-lg">
           <h3 className="text-xl font-bold">Connect 4 AI</h3>
           <p className="mt-2">Project @ jaden.lol</p>
-          <button className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-full">
+          <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-full">
             Learn more
           </button>
         </div>
