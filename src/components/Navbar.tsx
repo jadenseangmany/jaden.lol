@@ -1,7 +1,7 @@
 // src/components/Navbar.tsx
 export default function Navbar() {
     return (
-      <nav className="w-full bg-black text-white py-4 fixed top-0 z-10">
+      <nav className="w-full bg-black bg-opacity-50 backdrop-blur-md text-white py-4 fixed top-0 z-10">
         <div className="container mx-auto flex justify-between items-center px-6">
           {/* Logo */}
           <div className="text-lg font-bold">|o|</div>
