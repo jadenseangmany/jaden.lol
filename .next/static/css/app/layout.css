@@ -640,27 +640,6 @@ video {
 .bg-opacity-50 {
   --tw-bg-opacity: 0.5;
 }
-.bg-opacity-100 {
-  --tw-bg-opacity: 1;
-}
-.bg-opacity-0 {
-  --tw-bg-opacity: 0;
-}
-.bg-opacity-90 {
-  --tw-bg-opacity: 0.9;
-}
-.bg-opacity-95 {
-  --tw-bg-opacity: 0.95;
-}
-.bg-opacity-30 {
-  --tw-bg-opacity: 0.3;
-}
-.bg-opacity-10 {
-  --tw-bg-opacity: 0.1;
-}
-.bg-opacity-5 {
-  --tw-bg-opacity: 0.05;
-}
 .bg-gradient-to-b {
   background-image: linear-gradient(to bottom, var(--tw-gradient-stops));
 }
@@ -709,10 +688,6 @@ video {
   font-size: 1.125rem;
   line-height: 1.75rem;
 }
-.text-sm {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-}
 .text-xl {
   font-size: 1.25rem;
   line-height: 1.75rem;
@@ -724,18 +699,13 @@ video {
   --tw-text-opacity: 1;
   color: rgb(0 0 0 / var(--tw-text-opacity, 1));
 }
-.text-white {
-  --tw-text-opacity: 1;
-  color: rgb(255 255 255 / var(--tw-text-opacity, 1));
-}
 .text-blue-600 {
   --tw-text-opacity: 1;
   color: rgb(37 99 235 / var(--tw-text-opacity, 1));
 }
-.shadow-md {
-  --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+.text-white {
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity, 1));
 }
 .backdrop-blur-md {
   --tw-backdrop-blur: blur(12px);
