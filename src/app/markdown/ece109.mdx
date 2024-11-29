@@ -1,0 +1,55 @@
+# ECE 109 - Probability & Statistics for Engineers
+**Course taught by Ken Zeger @ University of California, San Diego**
+
+### Introduction
+
+This is a special course for me because this is the very first upper division course I've taken, and was actually in my very first quarter at UCSD, and my very first statistics course. And also because this is the very first course I failed in my life. I took this course with Ken Zeger, an extremely talented and mathematically inclined professor currently at UCSD, to which I was too overconfident and insufficiently diligent to perform well and learn as much as I should have. Actually, I owe all of this to my good friend, Jay, who recommended me to take this course, telling me that I would learn an astonishing amount in hands of such professor. Who would've known that it was a course with a 30% fail rate, and an average exam score of 35%. Not Jay, of course. All jokes aside, failing this course granted me an invaluable learning opportunity and taught me a lot about humility, and what it means and what it takes to become an engineer. The reason I failed was because I tried to focus on problem solving strategies and the best way to do well on the quizzes and exams, instead of actually learning the content in, out, rotated, translated, inverted, reversed, and tertrated. This actually inspired me to write these sort of blog style textbook-ish write ups for all my courses in order for me to maximize use of the Feynman Technique, force me to learn the ins and outs of my courses, and gain the skills to succeed with flying colors in my career paths.
+
+### Set Theory
+
+In most upper division math courses, you would need to be familiar with set theory because a lot of theories and strategies to solving problems are generalized in such a way that uses lots of symbols and formations, and it also helps in making the solution as rigorously defined as possible. Set theory also allows you to manipulate structures and groups of numbers with defined rules, which we have to follow for math. Following Zeger's approach in teaching, we aren't just going to give a simple and boring definition and formula then start cranking on examples, instead we're going to do the reverse and see if it makes more sense from there instead.
+
+#### Ex 1a:
+
+We flip a fair coin twice. How many different outcomes are there?
+
+#### Solution:
+
+So I actually forgot to define some important stuff related to probability before talking about set theory, but we can do it altogether. So first of all, what do you think an **outcome** is? Before reading ahead, think about what "outcome" means in the context of the provided example. Ok hopefully you thought about it; now let's go through the thought process. We're flipping a coin twice, so the outcome must be what happens to the coin after we're done flipping it. However, it's not just after we're done flipping it once, it's after we're done flipping it twice. Why? It's because the outcome is directly related to what caused it, which is flipping a fair coin twice. In this case, the flipping is called an **experiment**. So now we need to find all the different outcomes of our experiments, or in other words, what are the different possible cases that could end up to the coin after we flip the coin twice. Let's actually flip a coin twice to see what this looks like.
+
+Flip 1: Lands heads
+Flip 2: Lands heads
+
+Alright, now, the outcome is that it lands heads twice. So we can write this as something like $\{HH\}$ for heads heads, with the curly brackets being something so that we can tell that it is an outcome of an experiment. Now each of those flips could have different combinations, so let's write them all:
+$$
+\{HH,HT,TH,TT\}
+$$
+So now we figured out the answer. There are **four different outcomes**, and the list of different outcomes is actually called a **sample space**. The number of different outcomes (which in this case it was four) is synonymous with the size of such sample space, which is also called the **cardinality** of such sample space. Do you think we can generalize this idea so we can find a formula to see what the cardinality is for any flipping coin problem? Let's see.
+
+#### Ex 1b. 
+
+Suppose we flip a fair coin $n$ times, how many outcomes are there?
+
+#### Solution:
+
+Ok, so we know there are four outcomes if we flip the coin twice. What if we flip it once?
+$$
+\{H,T\}
+$$
+Seems legit. Ok how about three times?
+$$
+\{HHH,HHT,HTH,HTT,THH,THT,TTH,TTT\}
+$$
+Ok now it's getting kinda hectic. Notice that I did it in order of binary, where the H's were acting like zeroes and the T's were acting like ones. This will be very helpful in the future when you're constructing sample spaces and you want to make sure you didn't miss any outcome or didn't repeat one on accident. Ok great, so it looks like there's eight different outcomes now. Now we can see that with one flip, there are two outcomes. With two flips, there are four, and with three flips, there are eight. From the pattern, we can deduce that **the cardinality of the set of $n$ coin flips is just $2^n$ outcomes.**
+
+#### Summary
+
+Alright so a quick summary so far, we were able to define the following terms:
+
+**Experiment**: When you design a problem and you want to find out a probability of something happening. For example, flipping a coin is an experiment.
+
+**Outcome**: The result of an experiment. There can only be one outcome. For example, a coin landing heads is an outcome of a single flip experiment.
+
+**Sample Space**: The set of all outcomes from an experiment. For example, a single coin flip's sample space will be $\{H,T\}$.
+
+**Cardinality**: The size of a sample space, or the number of outcomes in a sample space. For example, in a single coin flip experiment, there are two outcomes, so the cardinality is two.
