@@ -26,6 +26,9 @@ export default function Navbar() {
             <Link href="/Courses" className="hover:underline">
               Courses
             </Link>
+            <Link href="/Socials" className="hover:underline">
+              Socials
+            </Link>
           </div>
         </div>
       </nav>
