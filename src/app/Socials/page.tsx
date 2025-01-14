@@ -3,13 +3,14 @@ import React from "react";
 
 const Page = () => {
   const socials = [
-    { name: "Instagram", link: "https://instagram.com/placeholder", buttonText: "Follow" },
+    { name: "Instagram", link: "https://www.instagram.com/jadenseangmany/", buttonText: "Follow" },
     { name: "LinkedIn", link: "https://linkedin.com/in/jadenseangmany", buttonText: "Connect" },
     { name: "Discord", link: "http://discord.com/users/336738623661801473", buttonText: "Send friend request" },
     { name: "Email", link: "mailto:jadenseangmany@gmail.com", buttonText: "jadenseangmany@gmail.com" },
   ];
 
   return (
+    <div className="bg-gray-100 min-h-screen">
     <section id="socials" className="py-16 bg-gray-100 text-black">
       <div className="grid grid-cols-2 gap-4 px-8">
         {socials.map((social, index) => (
@@ -32,6 +33,7 @@ const Page = () => {
         ))}
       </div>
     </section>
+    </div>
   );
 };
 

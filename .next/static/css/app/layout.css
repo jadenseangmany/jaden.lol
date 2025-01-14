@@ -989,6 +989,9 @@ video {
 .min-h-\[60vh\] {
   min-height: 60vh;
 }
+.min-h-screen {
+  min-height: 100vh;
+}
 .w-full {
   width: 100%;
 }
