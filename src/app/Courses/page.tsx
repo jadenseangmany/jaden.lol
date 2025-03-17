@@ -32,6 +32,18 @@ export default function CoursesSection() {
           </button>
           </Link>
         </div>
+
+        {/* CSE 101 */}
+        <div className="flex flex-col items-center justify-end min-h-[60vh] w-full bg-gray-100 text-black">
+          <h3 className="title-text mt-8">Design & Analysis of Algorithms</h3>
+          <p className="subtitle-text mt-2">CSE 101</p>
+          <Link href="/mdx-page">
+          <button className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-full">
+            Learn more
+          </button>
+          </Link>
+        </div>
+
       </div>
     );
   }

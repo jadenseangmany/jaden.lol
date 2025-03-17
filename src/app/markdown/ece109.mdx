@@ -1,55 +1,396 @@
-# ECE 109 - Probability & Statistics for Engineers
-**Course taught by Ken Zeger @ University of California, San Diego**
+# CSE 101 Final Study (Topics that I don't know + answers)
+# Graphs
+## Linearization (topological sort)
+Linearization (or topological sort) is when you take a DAG (Directed Acyclic Graph) and you spit out a sequence that follows each vertices' dependency. In other words, it chooses a sequence where it does not skip ahead a vertex. In more other words, it returns a sequence where all the edges go in one direction. In more other words (part 2), it arranges the vertices so that each item comes before the item it depends on.
+### Example 1
+One of the most common use cases for linearization is in academic course sign up software (webreg, registration portals, etc.) For example, in order to take Machine Learning, you must first take Linear Algebra, which also requires you to take Calculus. Let's say that Machine Learning also requires you to take Python. So in the database, all you would have is a bunch of courses listed out in a graph like:
+```
+Calculus -> Linear Algebra -> Machine Learning
+								^
+								|
+							  Python
+```
+And let's say you're building the software to make sure that people can't take Machine Learning without taking it's prerequisite courses. 
+**sol:**
+To make this possible, you want to be able to create a list where it's in the order that adheres to the prerequisite requirements (so it can check to see if the student has taken the classes in that order.) So one of the correct options would return something like:
+`[Calculus, Linear Algebra, Python, Machine Learning]`
+So we want an algorithm where we can do this for super large DAGs (maybe for each department if we want to generate a course schedule or something and ensure that a student takes the courses in order)
+### Algorithm
+So what's the algorithm to linearize a DAG? What you would do is run a DFS on the graph, then return the reverse of the post order output. This is kinda cool because it takes advantage of the nature of a DFS and its post order traversal, because doing a DFS normally just does the reverse of what a linearized DAG wants (since DFS basically goes backwards after it reaches the end).
+**psuedocode:**
+```
+linearizeDAG(G):
+	run DFS(G) # This would return a list of vertices following post order traversal.
+	return reverse(post_order_output)
+```
+## SCC Algorithm
+This basically just finds all the SCC's in a graph (outputs a list of all the SCCs.) To understand how the algorithm works, let's first define what are *sinks* and *sources*.
+**Sources:**
+Sources are when you have a vertex and it only has outgoing edges and no incoming edges, so it kinda sources the entire graph.
+**ex:**
+`A->B->C`
+In this graph, A is a source.
+**Sinks:**
+Sinks are when you have a vertex and there are no outgoing edges, and only incoming edges, so the graph would "sink" into a sink vertex. In the above example, C would be the sink. B would be neither.
+**Lemma:**
 
-### Introduction
+> A vertex with the greatest post number in any DFS belongs to a 
+> source SCC.
 
-This is a special course for me because this is the very first upper division course I've taken, and was actually in my very first quarter at UCSD, and my very first statistics course. And also because this is the very first course I failed in my life. I took this course with Ken Zeger, an extremely talented and mathematically inclined professor currently at UCSD, to which I was too overconfident and insufficiently diligent to perform well and learn as much as I should have. Actually, I owe all of this to my good friend, Jay, who recommended me to take this course, telling me that I would learn an astonishing amount in hands of such professor. Who would've known that it was a course with a 30% fail rate, and an average exam score of 35%. Not Jay, of course. All jokes aside, failing this course granted me an invaluable learning opportunity and taught me a lot about humility, and what it means and what it takes to become an engineer. The reason I failed was because I tried to focus on problem solving strategies and the best way to do well on the quizzes and exams, instead of actually learning the content in, out, rotated, translated, inverted, reversed, and tertrated. This actually inspired me to write these sort of blog style textbook-ish write ups for all my courses in order for me to maximize use of the Feynman Technique, force me to learn the ins and outs of my courses, and gain the skills to succeed with flying colors in my career paths.
+Alright so, what does this mean? What do post numbers mean? So in a DFS, when you start putting stuff in your visited array, and you start backtracking, when you return to a node that you already visited after you start backtracking, you can put that in a post order array. So every node you see twice in a DFS basically is when you increment the post number. Ok... so how does that relate to it being a source? To explain this better, let's look at an example.
+```
+   A
+  / \
+ B   C
+  \
+   D
+```
+(imagine that it's directed and its always pointing down)
+Ok, so let's do a DFS. Let's start at A. Let's keep track of a stack and visited array:
+```
+Stack: []
+Visited: []
+```
+Now we can put A in the stack and visit it.
+`Stack: [A]`
+Great, now since we're starting there, let's mark it as visited.
+```
+Stack:[A]
+Visited: [A]
+```
+Now, let's make an arbitrary decision and choose B to visit next. Now, we add B on to the stack, and add it on to visited.
+```
+Stack: [A,B]
+Visited: [A,B]
+```
+Great, and since it's depth first search, we'll visit D next and add it onto the stack.
+```
+Stack: [A,B,D]
+Visited: [A,B,D]
+```
 
-### Set Theory
+Now we have nowhere else to go, so we'll use the stack to *backtrack*up back to the parent. So we'll pop D first and see that there's nowhere to go, so then we'll pop B.
+```
+Stack: [A]
+Visited: [A,B,D]
+```
+Now we can see there's somewhere else to go, which is C. So let's add that to the stack and add it to visited.
+```
+Stack: [A,C]
+Visited: [A,B,D,C]
+```
+Awesome, now let's pop C and A out so we can backtrack and check if there's anything more.
+```
+Stack: []
+Visited: [A,B,D,C]
+```
+Is there anything else? No. So now we're done and we have a visited array and an empty stack. So now, what are the post numbers? First let me ask you a question: What needed to occur for us to pop? And what was effectively happening in terms of the traversal for us to pop (which vertices were we visiting)? So for us to pop, we had to return to a vertex and make sure there is nowhere to go other than an already visited vertex. For example, when we popped D and B, there was nowhere else to go. So the post number is basically just the order of the pops. We popped D, then B, then C, then finally A. So the post numbers would effectively be:
+```
+D(1)
+B(2)
+C(3)
+A(4)
+```
+Awesome! Now, what was our lemma again? The greatest post number is a source SCC? What's the vertex with greatest post number? A? Is it a source? Yes it is. So that's how the lemma works. Can we say it's true for the opposite? E.g. "The vertex with the least post number must belong to a sink SCC"
+In this case, the vertex with the least post number would be D, which is indeed a sink. However, this is not true for all cases.
+Consider the following counter example:
+```
+   A
+  / \
+ B   C
+  \ 
+   D 
+```
+The edges are as follows:
+`A->B, A->C, B->D, D->B(this one is added)`
+On inspection, we can see that A is a source, and C is a sink. However, let's check with the DFS post numbers.
+```
+Visited: [A,B,D,C]
+Post numbers:
+D(1)
+B(2)
+C(3)
+A(4)
+```
+With that added edge, it makes it such that D is not a sink, yet the post number is still the least. Therefore, it proves that the least post number cannot always be a sink.
+**Actual SCC Algorithm**
+Alright that's crazy and all, but the whole point of this is to find SCCs. Now knowing all this prerequisite knowledge, we can do a crazy trick. Let's think about a sink SCC. What vertices can be explored in a sink? Nothing, right? The definition is that it has no outgoing edges. How about in a sink SCC set where there is more than one vertex in the sink SCC? It can only visit every vertex that's within that SCC, right? And its guaranteed that every vertex that's in a sink SCC is an SCC right (that's crazy)? So what if we find a sink SCC, run explore on a vertex that's in that sink SCC and save the info, remove that sink SCC from the graph, and repeat? If we are able to find all the sink SCCs, then we are guaranteed to find all the SCCs in the graph. But the thing is, like we saw earlier, we can't just find a sink SCC because it's not the least post number. However, we can do a crazy magic trick. Remember how a source SCC is always the highest post number? What if we just reverse that graph (flip all the edges)? Then that must mean the sources of the reversed graph is just the sink of the regular graph. That's so crazy isn't it? So here's our algorithm:
+**psuedocode:**
+```
+def findSCC(G):
+	Compute G_reversed
+	Run DFS on G_reversed
+	Run DFS on G
+	Order the vertices on G to go in decreasing order from the post numbers in the DFS on G_reversed.
+	Incremement cc for every unvisited vertex reached. 
+```
+We take advantage of the fact that reversing the graph will make it so that sources are sinks, then use those post order numbers to do a DFS on the regular graph. When we do a DFS on the regular graph, it starts from an SCC because it starts from the sink SCC. Then when it moves on to the other vertices, it will only find those that are SCCs.
+## Cut Property
+Cut property says if you have a graph, and you make one cut through the entire graph, then there would be two graphs right? The edge that connects those graphs together with the smallest weight would be part of an MST.
+**Exchange Argument Proof:**
+Imagine you have OS which is an edge weight that connects the split graphs that isn't the lightest edge weight, e, which is in OS'. That must mean that the edge weight in OS is greater than OS'. Therefore, if we choose OS', e will be part of an MST as it is lighter than that of OS. 
+# Greedy Algorithms
+## Exchange Argument
+Exchange argument is a way to prove a greedy algorithm. It basically says that if you make a greedy choice, your choice is reaches the same or better outcome than picking any other possible choice. In other words, you compare your greedy choice with the other choice, and show that it's better.
+**Example:**
+Imagine you're a construction contractor and you need to schedule the jobs you want to take. You want to schedule the maximum number of jobs, with the constraint that you can't work two jobs at the same time. Here's an example on how it works:
+```
+AvailableJobs(day, duration):
+	1: (4,3)
+	2: (2,1)
+	3: (6,4)
+	4: (7,2)
+```
+If you have this schedule, you can choose to work jobs 1, 2, and 4. You could work job 2 on day 2, job 1 on days 4, 5, and 6, then work job 4 on days 7 and 8.
 
-In most upper division math courses, you would need to be familiar with set theory because a lot of theories and strategies to solving problems are generalized in such a way that uses lots of symbols and formations, and it also helps in making the solution as rigorously defined as possible. Set theory also allows you to manipulate structures and groups of numbers with defined rules, which we have to follow for math. Following Zeger's approach in teaching, we aren't just going to give a simple and boring definition and formula then start cranking on examples, instead we're going to do the reverse and see if it makes more sense from there instead.
+Before we start thinking on how to solve the problem, let's outline what we are looking for. We want to find out what is our **instance, solution format, constraints, objective, and goal.** Instance just means what are we given in the problem. Solution format is what type of data should we return after we solve the problem, or what type of data are we looking for? It could be a number, a set, etc. The constraints is what we can't do when solving the problem. The objective is what is the type of data is your goal, and the goal is whether you want to maximize or minimize the objective. Let's see what these are for our problem:
 
-#### Ex 1a:
+**Instance:** List of potential jobs
+**Solution Format:** Subset of jobs
+**Constraints:** No overlapping jobs
+**Objective:** Number of jobs
+**Goal:** Maximize the number of jobs
 
-We flip a fair coin twice. How many different outcomes are there?
+In other words, this list basically means that we are given a list of potential jobs, we can't make any of the jobs overlap, and we want to maximize the number of jobs and return it as a subset of jobs. Now let's think about how we can solve the problem. Consider the following greedy strategy:
 
-#### Solution:
+> Pick the last job to start. Remove that job and all conflicting jobs and repeat with the remaining jobs until there are no jobs left.
 
-So I actually forgot to define some important stuff related to probability before talking about set theory, but we can do it altogether. So first of all, what do you think an **outcome** is? Before reading ahead, think about what "outcome" means in the context of the provided example. Ok hopefully you thought about it; now let's go through the thought process. We're flipping a coin twice, so the outcome must be what happens to the coin after we're done flipping it. However, it's not just after we're done flipping it once, it's after we're done flipping it twice. Why? It's because the outcome is directly related to what caused it, which is flipping a fair coin twice. In this case, the flipping is called an **experiment**. So now we need to find all the different outcomes of our experiments, or in other words, what are the different possible cases that could end up to the coin after we flip the coin twice. Let's actually flip a coin twice to see what this looks like.
+This strategy does work, so let's prove it by using an *exchange argument*.
 
-Flip 1: Lands heads
-Flip 2: Lands heads
+**Exchange Argument**:
+For the exchange argument to be valid, we need to define g, define another solution, and define the solution that does include g and show why it's valid and better.
 
-Alright, now, the outcome is that it lands heads twice. So we can write this as something like $\{HH\}$ for heads heads, with the curly brackets being something so that we can tell that it is an outcome of an experiment. Now each of those flips could have different combinations, so let's write them all:
+**Defining g, OS, and OS':**
+First, let's say that g is our greedy choice, so it's when we pick the last job to start. Then, we should say that OS (which stands for Other Solution) is a set of choices that does not include g. In other words, it's just every choice that isn't when we pick the last job to start.
+
+The next step is to define OS'. OS' is the valid set of jobs that includes g and has the following property:
+$$|OS|\le|OS'|$$
+which basically means that the size of the solution that includes g has to be greater than the the solution that doesn't include g. Why? Because our problem says that we want to maximize the number of jobs, and OS and OS' are sets of jobs. So that means that if the solution with our greedy choice is bigger, that means that there are more jobs than the solution without the greedy choice, which is basically what the exchange argument is trying to prove.
+
+**Define OS' in terms of OS:**
+Now, let's see if we can define OS' in terms of OS to get a better understanding. We can say that OS' is just OS where the last job to start is just replaced with the greedy choice, g. This works because g is defined to be the latest possible start time, so whatever the last job to start in OS has to start at least the same or earlier than g. 
+
+**General solution when defining OS'**:
+Every time we need to define OS' in terms of OS, it's just replacing a choice in OS that takes our greedy idea with the greedy choice we're making. So the greedy idea in this case is picking the last job to start. So in OS, whatever is the last job to start, we'll replace it with g. The same thing could be said if our greedy idea was earliest time, least conflict, furthest distance, shortest distance, strongest, weakest, etc. We would just replace whatever is the earliest/least/greatest or whatever in OS with our greedy choice g. Then that would create OS'.
+
+**Why is OS' a valid solution?**
+Alright, now we have to justify that OS' is a valid solution. In other words, we need to show that OS' follows the constraints of the problem, which is to make sure that there are no overlapping jobs. So we said earlier that OS' is OS but then we replace the last job in OS with g. This is valid **only** if OS is valid. We can already see that OS' is valid because we defined OS' in terms of OS. So one argument is that given that OS is valid, and the last job in OS is valid (lets call it like LJOS (last job OS) or something), then if we replace LJOS with g, then it must either be in the exact same place as LJOS or later. In other words, LJOS must be earlier or at the same spot as g, so if g replaces it, there must be no conflicts if LJOS doesn't already have any conflicts. There's a lot of words and redundancies in there that makes it a bit confusing, so let's have a final clarification:
+
+Assuming that OS is valid, OS' simply replaces the last job in OS with g, where go is at the same start time or greater. Therefore, there must not be any conflicts in OS if the last job in OS doesn't have any conflicts.
+
+**General reasoning as to why OS' is always valid**:
+You have to look at what is OS' doing to OS based on the definition. If OS' is just replacing something in OS, then if we assume that OS is valid, that means that everything that comes before or after or in between that replacement is valid, and since it's just a replacement, that means that replacement is always valid. Typically when we define OS', it's usually an addition or replacement, and all you have to say is that if OS is valid, then OS' must be valid because we're simply modifying OS.
+
+**Why is $|OS'|\ge|OS|$?**
+So this is the property that we stated earlier that OS' has to have ($|OS|\le|OS'|$ but it's just swapped around but it's still the same thing.) Now we want to show that there are more or just as many jobs in OS' than OS, which basically is just showing why the greedy solution is better. So these are all kinda redundant because it comes from the same thing when we defined OS', but let's once more show our definition of OS': replace the latest job in OS with g. From this, we can see that OS' already at least the same size as OS because in our definition, we already just take everything that's in OS and just replace the last job with something else. Therefore, it OS' must at least have the same size as OS. Now, to show that OS' can be better, we'll just say that when we replace the last job in OS with g, g can be further away than the last job in OS. This is because we said earlier that g is defined to be the latest possible job. If OS also had the latest possible job selected, then that's great and that just makes it the same as g. However, there are chances that the last job in OS could have been earlier than g. We can say that if we have a later job than the latest job in OS, then there will be more room to fit in more jobs. Therefore, OS' has the potential to be greater than OS, which justifies our case. But really, when we need to answer this question, it's just because we're replacing something, which means that it stays the same size. So, to summarize:
+
+Replacing the last job in OS with g is just a single swap, so it must mean that OS and OS' have at least the same sizes.
+
+**General solution as to why OS' is always at least the same size as OS:**
+If OS' is a replacement, then OS' has to be at least the same size as OS. If it's an addition, then it has to be bigger than OS. Usually whatever your OS' is, it's just replacing something in OS with g, so it's always gonna be at least the same size.
+
+**Summary**:
+So in summary, for an exchange argument to be valid, you first have to define OS' in terms of OS, then just show why it's a valid solution, and why it's at least better than any other solution.
+## Greedy Stays Ahead
+Honestly greedy stays ahead is similar to exchange argument, but it's proven in an inductive fashion. Greedy stays ahead is when you compare two sets of solutions, GS (greedy solution) and OS (other solution). In exchange argument, we compared OS to OS', where OS' is when we make just a single change in OS to create OS'. GS on the other hand is when the entire set is different than OS, because we pick the greedy solution at each step, instead of just at the end or the beginning.
+
+**Example**:
+So let's just use the previous problem as an example for greedy stays ahead, where we'll prove it with greedy stays ahead instead of an exchange argument. So first, let's define our GS and OS. GS will be the solution set of picking the last start time at every instance of a job (let's say it's a set of something like $\{g_1,g_2,...,g_i\}$) and OS will be another valid solution that does not include any of those g's. 
+
+**Validity of GS**:
+Now we need to first show that GS is actually valid. We can just say that since OS is valid, and GS is the same as OS except at every job of OS, we just use the GS selection instead, which by definition is at least later than the selections in OS. Therefore, because OS is valid, and GS is the set of solutions that are later than OS, GS must be valid.
+
+**Why is GS better than OS?**
+GS is better because at every instance of OS, there is simply a choice of g. Therefore the choices would at least be at the same selection or later than OS. A later selection means that there's more space to pick more jobs, and therefore shows that GS is better than OS. We can clarify this through induction.
+
+**Induction**:
+*Base Case:*
+Let's say the base case is when there's just no jobs to pick, so both GS and OS would pick no jobs, and that would be the optimal solution, and that follows the property that $|GS|\ge|OS|$.
+*Induction Hypothesis:*
+We can just assume that GS is better or at least as good as OS after k steps. In other words, GS is better or as good as OS at some certain job selection. Then we just have to show that it's better for all the selections after that certain job selection. In other words, we need to show that GS is better or at least as good as OS in the k+1th step.
+*Inductive Step:*
+So for the inductive step, we can actively compare OS and GS. So let's imagine we have a selection of a job, k, in OS. Now, if we choose to pick a greedy selection of a job in GS, g. by definition, g would be at least the same time as k or later. If we were to replace k with g, then it would virtually be the same job selection, since it's a replacement. Following that logic, let's consider k+1 in OS. g+1 would virtually be the same job as k+1, but it would be either the same or later. Therefore, for every index in OS, if we just replace it with g in GS, it would be at least the same or later than the solution in OS. And, we know it's valid because in our induction hypothesis, we said that GS is at least as good as OS after k steps. By induction, we showed that GS is just as good as OS in k+1 steps.
+## Event Scheduling
+Event scheduling is a common problem when looking at how some greedy strategies work, and how some don't. The problem we did earlier in exchange argument and greedy stays ahead is an event scheduling problem. It turns out that the statement we were proving, the last start time, always gives you the maximum jobs/events being scheduled. The last start time is actually the same as the earliest end time (you kinda read it backwards.) Let's look at a counter example problem, where the greedy strategy really seems to work, but it doesn't at special edge cases. So imagine we have the same problem as the past two sections. Now let's take a look at the following greedy strategy:
+
+>Select the job with the shortest duration (break ties by earlier start day.) Remove that job and all conflicting jobs and repeat on the remaining jobs until there are no jobs left.
+
+Why doesn't this work? Let's take a look at a standard input:
+```
+jobInput(day, duration):
+	1:(1,2)
+	2:(3,2)
+	3:(1,3)
+```
+So in this input, we have job 1 that starts at day 1 and last 2 days, job 2 that starts at day 3 and lasts 2 days, and finally, job 3 that starts at day 1 and lasts 3 days. The greedy algorithm chooses the jobs with the shortest duration, and break ties with the earlier start day. So jobs 1 and 2 have the smallest duration, so it would pick the one with the earlier start day, which is job 1. Now we currently have job 1 that starts at day 1 and lasts until the end of day 2 (you work one day on day 1, then you work the second day on day 2, hence the 2 day duration.) We also had to remove job 3 from the schedule because it conflicted with job 1, and we already picked job 1. The job with the next smallest duration is job 2, so it picks that. Job 2 will start on day 3, and it lasts until the end of day 4, so that choice is valid and there is no need to remove any conflicts. So these choices work, we were able to pick two jobs and maximized our scheduling. So now it seems like this algorithm is pretty good. What if we were to make the following small change?
+```
+jobInput(day, duration):
+	1:(1,3)
+	2:(4,3)
+	3:(3,2)
+```
+Now, the algorithm would first choose job 3. Job 3 would start on day 3, and end at the end of day 4. However, when it chooses job 3, it conflicts with both jobs 1 and 2, because job 1 ends at the end of day 3, and job 2 starts at the beginning of day 4. Let's see what happens if you chose job 1 first. If you choose job 1, you would work from day 1 till the end of day 3, which means you can still chose job 2, which starts at the beginning of day 4 and ends at the end of day 6. If we were just to choose job 1 and 2 which don't conflict with each other, then that would be a better choice because there would be more jobs than if we chose job 3. So the way this works is if you put something in the middle of something, then this algorithm won't work.
+# Divide & Conquer
+## Multiplying Binary Numbers
+One problem we can solve using divide & conquer is multiplying binary numbers. There's a ton of algorithms that do it, but let's start with the simple one first, which is known as the Gradeschool Algorithm. It's basically what you learned in elementary school where you put two numbers on top of each other then put a line below, and you go through the whole top number by the right most digit of the bottom number.
+```
+  1101
+x 1011
+------
+(looks like something like this)
+```
+This whole process, when you implement it, has an $O(n^2)$ runtime, and we want to see if we can make it faster.
+## Multiply Algorithm
+Now let's take a look at an implementation where we used divide & conquer to help us make the gradeschool algorithm better. The way divide & conquer works is that *you can break a problem into similar subproblems, then solve each subproblem recursively, then if you combine each subproblem, it will total to the main problem*, and you will solve it. So let's try it with trying to make the gradeschool algorithm better. What if we split the n bit numbers in to left and right halves, then compute each half individually and combine them together later? So in this case, what are the subproblems, how do we solve each subproblem recursively, and how do we combine them?
+
+**Subproblems:**
+The left and right portion of two n bit numbers
 $$
-\{HH,HT,TH,TT\}
+x=2^{n/2}x_L+x_R
 $$
-So now we figured out the answer. There are **four different outcomes**, and the list of different outcomes is actually called a **sample space**. The number of different outcomes (which in this case it was four) is synonymous with the size of such sample space, which is also called the **cardinality** of such sample space. Do you think we can generalize this idea so we can find a formula to see what the cardinality is for any flipping coin problem? Let's see.
-
-#### Ex 1b. 
-
-Suppose we flip a fair coin $n$ times, how many outcomes are there?
-
-#### Solution:
-
-Ok, so we know there are four outcomes if we flip the coin twice. What if we flip it once?
 $$
-\{H,T\}
+y=2^{n/2}y_L+y_R
 $$
-Seems legit. Ok how about three times?
 $$
-\{HHH,HHT,HTH,HTT,THH,THT,TTH,TTT\}
+xy=2^nx_Ly_L+2^{n/2}(x_Ly_R+x_Ry_L)+x_Ry_R
 $$
-Ok now it's getting kinda hectic. Notice that I did it in order of binary, where the H's were acting like zeroes and the T's were acting like ones. This will be very helpful in the future when you're constructing sample spaces and you want to make sure you didn't miss any outcome or didn't repeat one on accident. Ok great, so it looks like there's eight different outcomes now. Now we can see that with one flip, there are two outcomes. With two flips, there are four, and with three flips, there are eight. From the pattern, we can deduce that **the cardinality of the set of $n$ coin flips is just $2^n$ outcomes.**
+**Recursive Solution**:
+Running the multiplication algorithm on each part using a FOIL method (multiplying the left parts of both numbers, the left part of one of the numbers each with the other being the right part, then both of the right parts of both numbers)
+```
+p1 = multiply(xL,yL)
+p2 = multiply(xL,yR)
+p3 = multiply(xR,yL)
+p4 = multiply(xR,yR)
+```
+**Combination**:
+Summing up each of the results of our subproblems
+```
+# Essentially the FOIL from above
 
-#### Summary
+return p1 * 2^n + (p2 + p3) * 2^(n/2) + p4
+```
+**Runtime:**
+Unfortunately, doing this still gives you $O(n^2)$. What improvement can we make?
+## Karatsuba Algorithm
+How can we improve the multiply algorithm? One way is to reduce the number of recursive calls. In the Multiply Algorithm, we made 4 recursive calls because there were 4 subproblems (p1, p2, p3, and p4). How can we reduce the number of subproblems? Mr. Karatsuba found a magic trick to solve this problem. Let's look at how he does it. First, remember the FOIL equation we made above:
+$$
+xy=2^nx_Ly_L+2^{n/2}(x_Ly_R+x_Ry_L)+x_Ry_R
+$$
+Now, consider this fact:
+$$
+R_1=x_Ly_L
+$$
+$$
+R_2=x_Ry_L
+$$
+$$
+R_3=(x_L+x_R)(y_L+y_R)
+$$
+$$
+\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;=x_Ly_L+x_Ly_R+x_Ry_L+x_Ry_R
+$$
+Notice how R1 and R2 already exist in R3. Can you guess what happens next? Consider the following equation:
+$$
+R_3-R_1-R_2=x_Ly_R+x_Ry_L
+$$
+So what we did is we basically saw that in R3, R1 and R2 are there and we already computed it previously, so we don't need to compute it again. This reduces our total subproblems to 3, and the return statement to be:
+```
+R1 * 2^n + (R3 - R1 - R2) * 2^(n/2) + R2
+```
+So the previous equation we had for xy (which was basically used as the return statement) had four multiplications, while this return statement only has three.
+**Runtime:**
+It turns out Karatsuba Algorithm is $O(n^{1.58})$ which is less than $O(n^2)$, a significant improvement.
+## Cook-Toom Algorithm
+You can even go faster! Imagine just generally dividing k subproblems each of size n/k. Without optimizing, you'll end up getting $O(n^2)$ because there are $k^2$ multiplications. Cook-Toom algorithm magically makes this idea optimized because they said that you can actually combine the subproblems into $2k-1$ multiplications instead of $k^2$. It turns out that this algorithm runs in $O(n^{1.404})$ time! But hey, we're not done yet! These dudes Harvey and Hoeven made an algorithm that's $O(n\:log\:n)$, crazy! No idea how it's done, but that's pretty cool I guess.
+## Two Runners Problem
+There's a lot more we can do with divide & conquer. Let's take a look at another common problem. Create this imagination in your head:
 
-Alright so a quick summary so far, we were able to define the following terms:
+>Two runners are running a race. Runner A starts at position 0 and runner B has a head start at position X. It is given that runner A wins the race in *n* seconds. You are given positions of each runner for each second of the race in the form of two arrays. You wish to find a position *j* that runner A "passes" runner B.
 
-**Experiment**: When you design a problem and you want to find out a probability of something happening. For example, flipping a coin is an experiment.
+Let's think how we can approach this. First, let's restate what we're trying to find in a more helpful manner. We want want to find a position where A passes B. In other words, there will be a time where A barely passes B, so that would be like the instant when A's position goes from $A\le B$ to $A>B$ . Another key thing we need to note is that the given arrays are times, so we can think of it as a sorted array. Every time you see a sorted array, you should think about Binary Search, which involves cutting things in half to find something. Since we are "looking" for something, Binary Search seems like the perfect algorithm for this problem. So now we know that we have to use binary search, but when do we find our answer? What number correlates to when A passes B? We can literally just say the constraint. Like what we said above, we want to find out when A starts out less than or equal to B, then after like a second or something, A becomes greater than B (signifying that it passes). In psuedocode, we could say the following:
+```
+# m is the middle point
 
-**Outcome**: The result of an experiment. There can only be one outcome. For example, a coin landing heads is an outcome of a single flip experiment.
+If A[m] <= B[m] and A[m+1] > B[m+1]:
+	return True
+```
+Which literally says, if A starts out less than B, then in the next given position, A passes B. Then we could just say the else cases. If A turns out to be less than B, then we'll search the right half (by adjusting the low to m + 1), and vice versa, if A turns out to be greater than B, then we'll search the left half by adjusting the high to be m. Then we could add a case where it doesn't find it then be like not found or whatever, but it'll basically go on forever until it finds the answer. Since it's binary search, it will have an $O(log\:n)$ runtime. In terms of divide & conquer, binary search basically cuts problems in halves, so you'll have a lot of subproblems, then you recursively solve them by going into smaller halves.
+## Selection Algorithm (QuickSelect)
+Selection algorithms are another way to use divide & conquer. Let's say we want to find the median of a number. It will go like this:
+1. Break a problem into similar problems, split the list into two sublists
+2. Solve each subproblem recursively, recursively select from one of the sublists
+3. Combine, determine how to split the list again
+Sorting then finding the median using binary search takes on average $O(n\:log\:n)$ which we want to make it faster. When we look at selection algorithms, we have to do this special thing called partitioning, which is kinda like splitting the lists in half, but instead of straight down the middle, we pick a thing called a *pivot* and split it relative to the pivot. You would split the lists where numbers higher than the pivot would go on the right side, and lower would go on the left side. Partitioning itself takes $O(n)$ since we just iterate through the list. Let's take a look at what the algorithm looks like on a high level:
+**psuedocode:**
+```
+def Selection(arr, k):
+	pick random integer, v
+	split list into three lists (SL, Sv, SR)
+	if k <= SL:
+		recurse in the left list
+	if k > SL + Sv:
+		recurse into the right list
+	if k <= SL + Sv:
+		return v
+	
+```
+So basically, you pick a random number, find the larger, equal to, and lesser numbers, and create three different lists. Keep going until the random number is equal to the median. This algorithm is called QuickSelect, which has an average runtime of $O(n)$ (but unfortunately a worst case of $O(n^2)$.)
+## Median of Medians
+Smart people came up with a faster way to select (who would've guessed), but it's basically just quick select, but you split it into 5 different lists and find the median of each list using quick select, until you find the median. It turns out that algorithm is $O(n)$ which is pretty crazy.
+## MergeSort
+First let's talk about sorting. If we sort things based on comparisons, it's known to be the same as traveling down a path in a tree. It's known that trees have n! leaves where n is the number of elements being sorted. It's also known that the height of the tree with n elements is just $log_2(n!)$ since there's n! leaves. Merge sort basically splits everything into halves until they're in a list with only one element in it, then merges back together (in the same order) and sorts, and repeats until it gets the whole list back. The runtime is $O(n\:log\:n)$.
+## QuickSort
+Remember QuickSelect? Yeah all the partitioning stuff? We used QuickSelect to find a number (the median in that case,) but what if we use it to sort instead? QuickSort is the exact same method of picking a random number as a pivot then creating partitions, but instead of looking for a number, we can partition all the way down until there's one element, then because we're partitioning into a lesser value, an equal value, and a greater value, when we reach the base case, it becomes implicitly sorted. Then we just combine, and after combination it will be the sorted list.
+**QuickSort vs MergeSort:**
+These are both really similar, but QuickSort just sorts as it splits, and MergeSort sorts as it combines.
+**Runtime:**
+It has an average runtime of $O(n\:log\:n)$ and worst case $O(n^2)$. Comparing the runtimes with MergeSort, QuickSort can only average an n log n, but MergeSort consistently gets that. So why use QuickSort over MergeSort? It takes less space, and also has the potential to be faster. If you don't really care about having a consistent run time (like in a real time system) then you can afford to use QuickSort to save space. On the other hand, MergeSort is better when you need to have crucial computations.
+## Convex Hull
+Convex Hull is when you're given a bunch of points on a graph and you wanna draw the smallest polygon that contains all the points, or in other words, return the points of the polygon. Let's see how we can use divide & conquer to solve this problem. First, we know that if there are 3 or fewer points, the convex hull is simply those points because it would form a triangle or line or point set. The divide step would be when you would split the points into two parts, forever, until you reach the base case. Then you would merge them together using some technique (which is finding the tangent lines which can be done in $O(n)$.) The total runtime of this would be $O(n\:log\:n)$.
+## Backtracking (reduce & conquer)
+Backtracking is basically just a trial and error guessing algorithm, where you *reduce* your problem into a *single* subproblem, and try different decisions and check if it's valid. If it isn't valid, you abandon (or backtrack) the decision and you try the other option. Then you just keep doing that until you reach the solution. Divide & conquer is when you split a problem into multiple subproblems, whereas with backtracking, you're reducing a problem into zero or a smaller subproblem, not multiple.
+## 8 Queens
+This problem is to figure out the placement of 8 non attacking queens on a chess board (like none of the queens can be killed by each other.) We can solve this through backtracking, here's a high level approach:
+First, we start with zero queens. We place a queen down and check if it's being attacked. If it's not being attacked, then we're good to place another queen down. Now, before we place another queen down, we check if that queen we can potentially placed down will be attacked or attacking another queen (this is called pruning.) If so, we go back and choose another spot, then we repeat until 8 queens are placed down, or all possibilities are exhausted. Worse case scenario this is $O(n!)$ (lol).
+## Sudoku
+Similarly to the 8 queens problem, we can solve sudoku through backtracking. Sudoku is basically a game where you try to fill a 9x9 grid with numbers such that there are no repeats of numbers in each sub-square, row, or column. Let's see how we can solve this through backtracking:
+First you start with an empty grid and place the least possible number somewhere that can be filled in. Now you just repeat this until it violates the constraint, then you just go back to the previous iteration and try somewhere else, and repeat.
 
-**Sample Space**: The set of all outcomes from an experiment. For example, a single coin flip's sample space will be $\{H,T\}$.
+Backtracking is kinda like playing a game, where you try to kill a boss, and you die, then you could just go back to your save point and try a different way of killing the boss.
+## Maximal Independence Set
+This problem is when you are given an undirected graph with nodes representing people, and there is an edge between A and B if A and B are enemies. We want to find the largest set of people such that no two are enemies. In other words, given an undirected graph, we must find the largest set of nodes such that no two are connected with an edge. Let's see how we can solve this problem. It is known that we can't use greedy to do this, but we can use backtracking. The way it works is you basically just pick a vertex, then check if you pick another vertex if it has an edge connected with the first vertex. If it's true then move on, if it's false then you pick another vertex and check again. 
+**Runtime:**
+$O(1.46^n)$ which is just a bit better than fibonacci, which is absolutely terrible. Smart people did get it to $O(1.2^n)$ though.
+## Weighted Event Scheduling
+Let's say, like the previous event scheduling problem, we wanted to maximize the number of events we select, but also take into account some weights in which we also want to maximize the weights. It is actually proven that no greedy algorithm will work for this, and a brute force algorithm would take $O(n2^n)$. What happens if we try backtracking?
+The way it works is you basically have to compute the optimal value that excludes some event In, which you can get by solving the problem for the first n - 1 events. Then you compute the optimal value including In. Then you simply return the max of those two values. The runtime of this is $O(2^n)$. Is there a better way to do this?
+# Dynamic Programming
+## Weighted Event Scheduling DP Version
+Ok, let's see if there's an actual way to solve the weighted event problem in a non exponential time. What if, instead of recursively solving this problem, we do it iteratively? Let's see how this works.
+First, you start by initializing an array with 0 events and 0 value. Then you can iterate over all the events, and find the last non overlapping event. We can store each of those in our array, then we can just take the maximum of those two, and that solves us our problem. It solves it in $O(n\:log\:n)$ which is much faster. The way dynamic programming works is just to calculate intermediate steps and store it into an array, so we can use it later instead of having to recurse.
+## Knapsack problem
+Suppose you're a burglar and you break into a store. You want to leave the store with the max value of the items, but your knapsack can only hold 13lbs. How do you maximize the things you get, while taking into account both the value and the weight? We can use dynamic programming, so let's try it:
+First, we need to answer what are our subproblems. The subproblem would be choosing just one of the items each, the incrementing up from there. The base cases would be that if the bag's capacity is 0 then you can't do anything, and if there's nothing in your bag then you also can't do anything. Now we have to calculate the recursion to fill the array. There are two cases we must consider. One is where an item we pick is part of the max value knapsack, and the other is then an item we pick is not part of the max value knapsack. We just have to take the max of both cases. The way we order the subproblems is we can just go row by row (assuming a weight value table) to fill our table, choosing the max as we go on. Then, all we have to do is return the last cell in the DP table, which considers all n items and total knapsack capacity, and that would be the max value.
 
-**Cardinality**: The size of a sample space, or the number of outcomes in a sample space. For example, in a single coin flip experiment, there are two outcomes, so the cardinality is two.
+In summary, we just have to create a table (called the DP table) where we can store the maximum value for each combination of values and capacities. We can process each item one by one, considering all possible capacities of the knapsack. Then we must decide whether we can include an item in our table or exclude it based on the wight and value. In order to make that decision, we can use the values in our DP table. Then we can just return the max value in our DP table. The runtime is $O(nC)$ where n is the number of items and C is the capacity.
+## Shortest Path in DAG
+We can use dynamic programming to find the shortest path in a DAG, which also includes negative weights (so better than Dijkstra's.) Let's see how it works:
+
+Initialize a dist table to keep track of the distances, and variable dist(s) as zero (the distance from the source to itself.) Then we can process each vertex in topological order and compute the shortest distance from the source vertex to a target vertex. Each time it computes, you store it back into into the dist table, and we can use that to recalculate anything that we have to recalculate again. Then at the end, we would have found the shortest path. The runtime of this is $O(|V|+|E|)$. Also if we want to find the longest path, we can also just negate all the edges.
+## Longest Increasing Subsequence
+Given a sequence of different positive integers, we want to find the longest increasing subsequence. An increasing subsequence is when the index increases and the value itself is also increasing. To solve this problem, we can just view it as a DAG where the vertices are positions in the array (and 0) and edges are just connecting if one number is in increasing order. The weights of the edges will also be -1, then we can just run our Shortest Path DAG algorithm.
+## Bellman Ford Algorithm
+We can use this algorithm to find the shortest path if there are negative edge weights. If there is a negative cycle, we return negative cycle. It uses the same ideas as the DAG, but it just detects if there's a negative cycle.
+## Floyd Warshall Algorithm
+# Network Flow
+## Network Flows
+## Ford Fulkerson
+## Linear Programming
+## Simplex Algorithm
+# Classical Computation
+## P vs NP
+## Travelling Salesperson
+## SAT, 2SAT, 3SAT
+## Psuedo Polynomial Time Algorithms
+## Vertex Covers
+## Loopholes
