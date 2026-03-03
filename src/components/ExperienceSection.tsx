@@ -1,32 +1,107 @@
+import Link from 'next/link';
+import { FadeInStagger, FadeInItem } from './FadeIn';
+
 export default function ExperienceSection() {
+  const experiences = [
+    {
+      company: "Mastercard",
+      role: "Mentorship Program Mentee",
+      date: "September 2025 – Present",
+      location: "Remote",
+      theme: "bg-black text-white",
+      titleColor: "text-white",
+      descColor: "text-gray-300",
+      buttonType: "outline",
+      link: "/Experience/Mastercard"
+    },
+    {
+      company: "Apple",
+      role: "Next-Gen Innovators Mentee",
+      date: "August 2025 – Present",
+      location: "San Diego, CA",
+      theme: "bg-gradient-to-b from-[#0E1440] to-[#F5F5F7] text-black",
+      titleColor: "text-white",
+      descColor: "text-white",
+      buttonType: "white",
+      link: "/Experience/Apple"
+    },
+    {
+      company: "ACM AI @ UCSD",
+      role: "Full-stack Developer",
+      date: "May 2025 – Present",
+      location: "San Diego, CA",
+      theme: "bg-black text-white",
+      titleColor: "text-white",
+      descColor: "text-gray-300",
+      buttonType: "outline",
+      link: "/Experience/ACM"
+    },
+    {
+      company: "CDC: Centers for Disease Control and Prevention",
+      role: "Undergraduate Researcher",
+      date: "September 2024 – Present",
+      location: "San Diego, CA",
+      theme: "bg-white text-black",
+      titleColor: "text-black",
+      descColor: "text-gray-900",
+      buttonType: "blue",
+      link: "/Experience/CDC"
+    },
+    {
+      company: "CSE Dept @ UCSD",
+      role: "Teaching Assistant",
+      date: "September 2025 – December 2025",
+      location: "San Diego, CA",
+      theme: "bg-black text-white",
+      titleColor: "text-white",
+      descColor: "text-gray-300",
+      buttonType: "outline",
+      link: "/Experience/UCSD"
+    },
+    {
+      company: "Cubic Corporation",
+      role: "Software Engineering Intern",
+      date: "June 2025 – December 2025",
+      location: "San Diego, CA",
+      theme: "bg-white text-black",
+      titleColor: "text-black",
+      descColor: "text-gray-900",
+      buttonType: "blue",
+      link: "/Experience/Cubic"
+    }
+  ];
+
   return (
-    <div className="flex flex-col items-center w-full">
-      {/* Data Engineer */}
-      <div className="relative flex flex-col items-center justify-start min-h-[60vh] w-full max-w-4xl mx-auto bg-black text-white">
-        <h3 className="title-text mt-8">Data Engineer</h3>
-        <p className="subtitle-text mt-2">Intern @ Turakhia Lab</p>
-        <button className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-full">
-          Learn more
-        </button>
-      </div>
+    <div className="relative flex flex-col items-center w-full z-10">
+      {experiences.map((exp, idx) => (
+        <div key={idx} className={`relative flex flex-col items-center justify-center min-h-[60vh] w-full py-16 ${exp.theme}`}>
+          <FadeInStagger>
+            <FadeInItem><h3 className={`title-text mt-8 ${exp.titleColor}`}>{exp.company}</h3></FadeInItem>
+            <FadeInItem><p className={`subtitle-text mt-2 ${exp.descColor}`}>{exp.role}</p></FadeInItem>
+            <FadeInItem><p className={`text-sm mt-1 mb-6 font-medium ${exp.descColor} opacity-80`}>{exp.date} | {exp.location}</p></FadeInItem>
 
-      {/* R&D Engineer */}
-      <div className="relative flex flex-col items-center justify-start min-h-[60vh] w-full mx-auto bg-gradient-to-b from-[#0E1440] to-[#F5F5F7] text-black">
-        <h3 className="title-text mt-8 text-white">R&D Engineer</h3>
-        <p className="subtitle-text mt-2 text-white">Intern @ FastChar</p>
-        <button className="mt-4 bg-white text-black px-6 py-2 rounded-full">
-          Learn more
-        </button>
-      </div>
-
-      {/* Full Stack Developer */}
-      <div className="flex flex-col items-center justify-end min-h-[60vh] w-full bg-gray-100 text-black">
-        <h3 className="title-text mt-8">Full Stack Web Developer</h3>
-        <p className="subtitle-text mt-2">ECE USC @ UCSD</p>
-        <button className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-full">
-          Learn more
-        </button>
-      </div>
+            <FadeInItem>
+              <div className="flex space-x-4 mt-4 justify-center">
+                {exp.buttonType === "blue" && (
+                  <Link href={exp.link} className="bg-blue-600 text-white px-6 py-2 rounded-full text-lg font-medium hover:bg-blue-700 transition">
+                    Learn more
+                  </Link>
+                )}
+                {exp.buttonType === "outline" && (
+                  <Link href={exp.link} className="bg-white text-black px-6 py-2 rounded-full text-lg font-medium hover:bg-gray-200 transition">
+                    Learn more
+                  </Link>
+                )}
+                {exp.buttonType === "white" && (
+                  <Link href={exp.link} className="bg-white text-black px-6 py-2 rounded-full text-lg font-medium hover:bg-gray-200 transition">
+                    Learn more
+                  </Link>
+                )}
+              </div>
+            </FadeInItem>
+          </FadeInStagger>
+        </div>
+      ))}
     </div>
   );
 }

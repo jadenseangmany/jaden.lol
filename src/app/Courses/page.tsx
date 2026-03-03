@@ -1,50 +1,73 @@
 import Navbar from "../../components/Navbar";
-import Link from "next/link";
 
 export default function CoursesSection() {
-    return (
-      <div className="flex flex-col items-center w-full">
-        {/* CSE 210 */}
-        <div className="relative flex flex-col items-center justify-start min-h-[60vh] w-full max-w-4xl mx-auto bg-black text-white">
-          <h3 className="title-text mt-8">Software Engineering</h3>
-          <p className="subtitle-text mt-2">CSE 210</p>
-          <button className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-full">
-            Learn more
-          </button>
-        </div>
-  
-        {/* CSE 160 */}
-        <div className="relative flex flex-col items-center justify-start min-h-[60vh] w-full mx-auto bg-gradient-to-b from-[#0E1440] to-[#F5F5F7] text-black">
-          <h3 className="title-text mt-8 text-white">Intro to Parallel Computation</h3>
-          <p className="subtitle-text mt-2 text-white">CSE 160</p>
-          <button className="mt-4 bg-white text-black px-6 py-2 rounded-full">
-            Learn more
-          </button>
-        </div>
-  
-        {/* ECE 109 */}
-        <div className="flex flex-col items-center justify-end min-h-[60vh] w-full bg-gray-100 text-black">
-          <h3 className="title-text mt-8">Probability & Statistics for Engineers</h3>
-          <p className="subtitle-text mt-2">ECE 109</p>
-          <Link href="/mdx-page">
-          <button className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-full">
-            Learn more
-          </button>
-          </Link>
-        </div>
+  const courses = [
+    {
+      name: "Software Engineering",
+      theme: "bg-white text-black",
+      titleColor: "text-black",
+      descColor: "text-gray-900",
+      buttonType: "blue"
+    },
+    {
+      name: "Machine Learning",
+      theme: "bg-black text-white",
+      titleColor: "text-white",
+      descColor: "text-gray-300",
+      buttonType: "outline"
+    },
+    {
+      name: "Parallel Computing",
+      theme: "bg-gradient-to-b from-[#0E1440] to-[#F5F5F7] text-black",
+      titleColor: "text-white",
+      descColor: "text-white",
+      buttonType: "white"
+    },
+    {
+      name: "Computer Architecture",
+      theme: "bg-white text-black",
+      titleColor: "text-black",
+      descColor: "text-gray-900",
+      buttonType: "blue"
+    },
+    {
+      name: "Computer Vision",
+      theme: "bg-black text-white",
+      titleColor: "text-white",
+      descColor: "text-gray-300",
+      buttonType: "outline"
+    }
+  ];
 
-        {/* CSE 101 */}
-        <div className="flex flex-col items-center justify-end min-h-[60vh] w-full bg-gray-100 text-black">
-          <h3 className="title-text mt-8">Design & Analysis of Algorithms</h3>
-          <p className="subtitle-text mt-2">CSE 101</p>
-          <Link href="/mdx-page">
-          <button className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-full">
-            Learn more
-          </button>
-          </Link>
-        </div>
+  return (
+    <div className="flex flex-col items-center w-full">
+      {courses.map((course, idx) => (
+        <div key={idx} className={`relative flex flex-col items-center justify-center min-h-[60vh] w-full ${course.theme}`}>
+          <h3 className={`title-text mt-8 ${course.titleColor}`}>{course.name}</h3>
+          <p className={`subtitle-text mt-2 ${course.descColor}`}>UC San Diego</p>
 
-      </div>
-    );
-  }
-  
+          <div className="flex space-x-4 mt-8">
+            {course.buttonType === "blue" && (
+              <>
+                <button className="bg-blue-600 text-white px-6 py-2 rounded-full text-lg font-medium hover:bg-blue-700 transition">Learn more</button>
+                <button className="bg-transparent border border-blue-600 text-blue-600 px-6 py-2 rounded-full text-lg font-medium hover:bg-blue-600 hover:text-white transition">Details</button>
+              </>
+            )}
+            {course.buttonType === "outline" && (
+              <>
+                <button className="bg-white text-black px-6 py-2 rounded-full text-lg font-medium hover:bg-gray-200 transition">Learn more</button>
+                <button className="bg-transparent border border-white text-white px-6 py-2 rounded-full text-lg font-medium hover:bg-white hover:text-black transition">Details</button>
+              </>
+            )}
+            {course.buttonType === "white" && (
+              <>
+                <button className="bg-white text-black px-6 py-2 rounded-full text-lg font-medium hover:bg-gray-200 transition">Learn more</button>
+                <button className="bg-transparent border border-white text-white px-6 py-2 rounded-full text-lg font-medium hover:bg-white hover:text-black transition">Details</button>
+              </>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}

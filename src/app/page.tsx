@@ -1,55 +1,35 @@
 // src/app/page.tsx
 import ExperienceSection from '../components/ExperienceSection';
+import { FadeInStagger, FadeInItem } from '../components/FadeIn';
 
 export default function Home() {
   return (
-    <div>
-      {/* Experience Section */}
-      <section id="experience">
-        <ExperienceSection />
+    <div className="relative overflow-hidden">
+      {/* Background glow effects for an Apple-like aesthetic */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl opacity-0 animate-glow pointer-events-none"></div>
+
+      {/* About Section */}
+      <section id="about" className="relative flex flex-col items-center justify-start min-h-[90vh] pt-32 w-full bg-black text-white pb-16 z-10">
+        <FadeInStagger>
+          <FadeInItem><h1 className="title-text mt-8">Hi I'm Jaden.</h1></FadeInItem>
+          <FadeInItem>
+            <p className="subtitle-text mt-2 px-4">
+              I like building things, learning, and reading webtoons.
+            </p>
+          </FadeInItem>
+
+          <FadeInItem>
+            <div className="flex space-x-4 mt-8 justify-center">
+              <a href="mailto:jadenseangmany@gmail.com" className="bg-blue-600 text-white px-6 py-2 rounded-full text-lg font-medium hover:bg-blue-700 transition">
+                Email me
+              </a>
+              <a href="https://linkedin.com/in/jadenseangmany" target="_blank" rel="noopener noreferrer" className="bg-transparent border border-gray-600 text-gray-300 px-6 py-2 rounded-full text-lg font-medium hover:border-white hover:text-white transition">
+                LinkedIn
+              </a>
+            </div>
+          </FadeInItem>
+        </FadeInStagger>
       </section>
-
-      {/* Projects Section */}
-      <section id="projects" className="py-16 bg-gray-100 text-black">
-      <div className="grid grid-cols-2 gap-4 px-8">
-        {/* Card 1 */}
-        <div className="bg-blue-100 text-center p-6 rounded-lg">
-          <h3 className="text-xl font-bold">Outreach Instructor</h3>
-          <p className="mt-2">Eta Kappa Nu @ UCSD</p>
-          <button className="mt-4 bg-transparent border border-blue-600 text-blue-600 px-4 py-2 rounded-full">
-            Learn more
-          </button>
-        </div>
-
-        {/* Card 2 */}
-        <div className="bg-black text-center text-white p-6 rounded-lg">
-          <h3 className="text-xl font-bold">Roblox Autofarm</h3>
-          <p className="mt-2">Project @ V3million</p>
-          <button className="mt-4 bg-transparent border border-blue-600 text-blue-600 px-4 py-2 rounded-full">
-            Learn more
-          </button>
-        </div>
-
-        {/* Card 3 */}
-        <div className="bg-white-100 text-center p-6 rounded-lg">
-          <h3 className="text-xl font-bold">Mathlab Tutor</h3>
-          <p className="mt-2">ASC @ Miramar College</p>
-          <button className="mt-4 bg-transparent border border-blue-600 text-blue-600 px-4 py-2 rounded-full">
-            Learn more
-          </button>
-        </div>
-
-        {/* Card 4 */}
-        <div className="bg-black text-center text-white p-6 rounded-lg">
-          <h3 className="text-xl font-bold">Connect 4 AI</h3>
-          <p className="mt-2">Project @ jaden.lol</p>
-          <button className="mt-4 bg-transparent border border-blue-600 text-blue-600 px-4 py-2 rounded-full">
-            Learn more
-          </button>
-        </div>
-
-      </div>
-    </section>
     </div>
   );
 }

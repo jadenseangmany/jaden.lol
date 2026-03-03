@@ -1,0 +1,37 @@
+export default function DecisionHelperProject() {
+    const proj = {
+        title: "This or That - Decision Assistant",
+        tools: "React, Next.js, Vercel",
+        theme: "bg-white text-black",
+        titleColor: "text-black",
+        descColor: "text-gray-900",
+        points: [
+            "Developed a decision-making assistant prototype built to help users seamlessly make choices between competing options.",
+            "Implemented the front-end interface using <strong>React</strong> and <strong>Next.js</strong> for a fast, responsive user experience.",
+            "Deployed the application infrastructure seamlessly using <strong>Vercel</strong>."
+        ]
+    };
+
+    return (
+        <div className={`relative flex flex-col items-center min-h-screen w-full pt-32 pb-16 ${proj.theme}`}>
+            <h3 className={`title-text mt-8 ${proj.titleColor}`}>{proj.title}</h3>
+            <p className={`subtitle-text mt-2 ${proj.descColor}`}>{proj.tools}</p>
+
+            <div className="flex space-x-4 mt-4">
+                <a href="https://github.com/jadenseangmany/Decision-Helper-COGS180" target="_blank" rel="noopener noreferrer" className="bg-blue-600 text-white px-6 py-2 rounded-full text-lg font-medium hover:bg-blue-700 transition">
+                    View GitHub
+                </a>
+            </div>
+
+            <div className="mt-16 max-w-4xl px-8 text-left w-full">
+                <ul className={`list-disc list-inside space-y-4 text-xl font-medium ${proj.titleColor === 'text-white' ? 'text-gray-200' : 'text-gray-800'}`}>
+                    {proj.points.map((point, pIdx) => (
+                        <li key={pIdx} className="leading-relaxed">
+                            <span dangerouslySetInnerHTML={{ __html: point }} />
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        </div>
+    );
+}
