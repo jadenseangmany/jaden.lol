@@ -4,9 +4,9 @@ export default function UCSDExperience() {
         role: "Teaching Assistant",
         date: "September 2025 – December 2025",
         location: "San Diego, CA",
-        theme: "bg-black text-white",
-        titleColor: "text-white",
-        descColor: "text-gray-300",
+        theme: "bg-white text-black",
+        titleColor: "text-black",
+        descColor: "text-gray-900",
         description: "Supported weekly labs for 250+ students on TypeScript and HTML/CSS, improving average project scores by 15%. I developed Python scripts to streamline grading and feedback, earning the highest course evaluations on record, and collaborated with instructional staff to iterate on lab design and align learning objectives across multiple sections."
     };
 

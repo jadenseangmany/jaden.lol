@@ -4,9 +4,9 @@ export default function ACMExperience() {
         role: "Full-stack Developer",
         date: "May 2025 – Present",
         location: "San Diego, CA",
-        theme: "bg-black text-white",
-        titleColor: "text-white",
-        descColor: "text-gray-300",
+        theme: "bg-white text-black",
+        titleColor: "text-black",
+        descColor: "text-gray-900",
         description: "Developed ACM AI's website, supporting 2,000+ members using React, MongoDB, Node.js, and Express.js. I also developed the AI Competitions platform, hosting 200+ national competitors and awarding over $5,000 in prizes, and refactored the competition logic to be configuration-driven, enabling easy support for new competitions. Additionally, I wrote several unit test suites and mocks using Jest that reduced manual verification time by approximately 2X."
     };
 

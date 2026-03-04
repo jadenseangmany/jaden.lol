@@ -2,9 +2,9 @@ export default function LLMProject() {
     const proj = {
         title: "Lightweight LLM Platform",
         tools: "Swift, Rust, Tauri, Docker, AWS",
-        theme: "bg-gradient-to-b from-[#0E1440] to-[#F5F5F7] text-black",
-        titleColor: "text-white",
-        descColor: "text-white",
+        theme: "bg-[#F5F5F7] text-black",
+        titleColor: "text-black",
+        descColor: "text-gray-900",
         points: [
             "Built a desktop-native multi-modal LLM platform with prompt branching and multi-window PIP workflows.",
             "Integrated OpenAI, Claude, and Gemini APIs to run prompts across models for comparison and reliability analysis.",
@@ -20,7 +20,7 @@ export default function LLMProject() {
             <p className={`subtitle-text mt-2 ${proj.descColor}`}>{proj.tools}</p>
 
             <div className="flex space-x-4 mt-4">
-                <a href="https://github.com/jadenseangmany/rainfy" target="_blank" rel="noopener noreferrer" className="bg-white text-black px-6 py-2 rounded-full text-lg font-medium hover:bg-gray-200 transition">
+                <a href="https://github.com/jadenseangmany/rainfy" target="_blank" rel="noopener noreferrer" className="bg-blue-600 text-white px-6 py-2 rounded-full text-lg font-medium hover:bg-blue-700 transition">
                     View GitHub
                 </a>
             </div>

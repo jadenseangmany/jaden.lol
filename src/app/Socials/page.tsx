@@ -15,7 +15,6 @@ export default function SocialsPage() {
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-3xl opacity-0 animate-glow pointer-events-none"></div>
 
       <FadeInStagger>
-        <FadeInItem><h1 className="title-text mb-12 text-center text-white z-10">Socials</h1></FadeInItem>
         <FadeInItem>
           <div className="relative bg-white/10 backdrop-blur-md p-8 sm:p-12 rounded-3xl shadow-2xl max-w-3xl w-full border border-white/20 z-10">
             <div className="flex flex-col space-y-4">

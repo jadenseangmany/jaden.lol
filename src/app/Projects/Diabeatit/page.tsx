@@ -2,7 +2,7 @@ export default function DiabeatitProject() {
     const proj = {
         title: "Diabeatit",
         tools: "Unity, C#",
-        theme: "bg-white text-black",
+        theme: "bg-[#F5F5F7] text-black",
         titleColor: "text-black",
         descColor: "text-gray-900",
         points: [
@@ -19,7 +19,7 @@ export default function DiabeatitProject() {
 
             <div className="flex space-x-4 mt-4">
                 <a href="https://github.com/jadenseangmany/Diabeatit-Lunchbox-Minigame-SP25" target="_blank" rel="noopener noreferrer" className="bg-blue-600 text-white px-6 py-2 rounded-full text-lg font-medium hover:bg-blue-700 transition">
-                    View GitHub
+                    View on GitHub
                 </a>
             </div>
 

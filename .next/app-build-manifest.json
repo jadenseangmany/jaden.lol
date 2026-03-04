@@ -11,20 +11,50 @@
       "static/chunks/main-app.js",
       "static/chunks/app/page.js"
     ],
-    "/Experience/page": [
+    "/experience/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/Experience/page.js"
+      "static/chunks/app/experience/page.js"
     ],
-    "/Projects/page": [
+    "/experience/Cubic/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/Projects/page.js"
+      "static/chunks/app/experience/Cubic/page.js"
     ],
-    "/Socials/page": [
+    "/experience/Mastercard/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/Socials/page.js"
+      "static/chunks/app/experience/Mastercard/page.js"
+    ],
+    "/experience/Apple/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/experience/Apple/page.js"
+    ],
+    "/projects/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/projects/page.js"
+    ],
+    "/projects/LLM/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/projects/LLM/page.js"
+    ],
+    "/experience/CDC/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/experience/CDC/page.js"
+    ],
+    "/projects/Diabeatit/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/projects/Diabeatit/page.js"
+    ],
+    "/socials/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/socials/page.js"
     ]
   }
 }
