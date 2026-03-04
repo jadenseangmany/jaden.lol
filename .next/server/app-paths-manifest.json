@@ -1,9 +1,1 @@
-{
-  "/experience/page": "app/experience/page.js",
-  "/projects/page": "app/projects/page.js",
-  "/page": "app/page.js",
-  "/socials/page": "app/socials/page.js",
-  "/experience/CDC/page": "app/experience/CDC/page.js",
-  "/projects/Diabeatit/page": "app/projects/Diabeatit/page.js",
-  "/projects/LLM/page": "app/projects/LLM/page.js"
-}
+{}

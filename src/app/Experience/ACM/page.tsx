@@ -17,7 +17,7 @@ export default function ACMExperience() {
             <p className={`text-sm mt-1 mb-6 font-medium ${exp.descColor} opacity-80`}>{exp.date} | {exp.location}</p>
 
             <div className="flex space-x-4 mt-4">
-                <a href="https://ai.acmucsd.com/" target="_blank" rel="noopener noreferrer" className="bg-white text-black px-6 py-2 rounded-full text-lg font-medium hover:bg-gray-200 transition">
+                <a href="https://ai.acmucsd.com/" target="_blank" rel="noopener noreferrer" className="bg-blue-600 text-white px-6 py-2 rounded-full text-lg font-medium hover:bg-blue-700 transition">
                     View Website
                 </a>
             </div>
