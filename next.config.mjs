@@ -10,7 +10,7 @@ const nextConfig = {
     return [
       {
         source: '/resume',
-        destination: '/images/Jaden_Seangmany_Resume__SWE_25_C_.pdf',
+        destination: '/resume/Jaden_Seangmany_Resume__SWE_25_C_.pdf',
         permanent: false,
       },
       {
