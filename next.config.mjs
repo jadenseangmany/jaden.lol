@@ -6,13 +6,16 @@ import rehypeKatex from 'rehype-katex';
 const nextConfig = {
   // Configure `pageExtensions` to include markdown and MDX files
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
-  async redirects() {
+  async rewrites() {
     return [
       {
         source: '/resume',
         destination: '/resume/Jaden_Seangmany_Resume__SWE_25_C_.pdf',
-        permanent: false,
       },
+    ];
+  },
+  async redirects() {
+    return [
       {
         source: '/github',
         destination: 'https://github.com/jadenseangmany',
