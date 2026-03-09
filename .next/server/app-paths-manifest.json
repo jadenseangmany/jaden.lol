@@ -1,1 +1,7 @@
-{}
+{
+  "/page": "app/page.js",
+  "/experience/page": "app/experience/page.js",
+  "/projects/DecisionHelper/page": "app/projects/DecisionHelper/page.js",
+  "/experience/Mastercard/page": "app/experience/Mastercard/page.js",
+  "/socials/page": "app/socials/page.js"
+}
