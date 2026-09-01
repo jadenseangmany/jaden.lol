@@ -1,7 +1,6 @@
 {
-  "/page": "app/page.js",
-  "/experience/page": "app/experience/page.js",
-  "/projects/DecisionHelper/page": "app/projects/DecisionHelper/page.js",
-  "/experience/Mastercard/page": "app/experience/Mastercard/page.js",
-  "/socials/page": "app/socials/page.js"
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/icon.svg/route": "app/icon.svg/route.js",
+  "/page": "app/page.js"
 }

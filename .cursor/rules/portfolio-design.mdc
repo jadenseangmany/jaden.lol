@@ -1,0 +1,18 @@
+---
+description: Rest/bloom portfolio design system — Vercel rest, Nurture bloom
+alwaysApply: true
+---
+
+# Portfolio design
+
+Follow `AGENTS.md` as the source of truth.
+
+- **Rest** is default: Geist Sans for prose, headings, labels, dates; Geist Mono only for tokens and `.lol`.
+- **Bloom** is earned: hover/focus/pin on important units. The whole unit’s type becomes Instrument Serif, not just the heading.
+- Atmosphere is the cursor: a looking-up canopy sunburst at the pointer, not a trailing orb. Covered letters scramble in place, then decipher into Instrument Serif.
+- Full bloom is an opt-in masthead `nurture` control. It is not the default. Turning it on sweeps a procedural forest top to bottom with a scramble, then the canopy continues at a steady speed as the reader scrolls. No bloom on/off or size menu.
+- The glass pill nav (Home / Work / Projects / About) sticks to the top after the hero. About is a route, not a landing section.
+- Duality is ideology for the agent, not copy on the page.
+- Facts live in `src/lib/content.ts`. Do not invent resume content.
+- Recreate Nurture in CSS/SVG. Do not use album screenshots as UI.
+- Respect `prefers-reduced-motion`. Bloom is atmosphere, never information.
