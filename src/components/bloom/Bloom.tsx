@@ -21,20 +21,46 @@ import {
 } from "./chars";
 
 export function bloomCursorRadius() {
-  return 18;
+  if (typeof document === "undefined") return 16;
+  return document.documentElement.classList.contains("bloom-cursor-hot")
+    ? 20
+    : 16;
 }
 
 const STORAGE_KEY = "jaden.bloom";
 
+export const BLOOM_MODES = ["hybrid", "nurture", "simple"] as const;
+export type BloomMode = (typeof BLOOM_MODES)[number];
+
+export function nextBloomMode(mode: BloomMode): BloomMode {
+  const index = BLOOM_MODES.indexOf(mode);
+  return BLOOM_MODES[(index + 1) % BLOOM_MODES.length] ?? "hybrid";
+}
+
+function isBloomMode(value: unknown): value is BloomMode {
+  return value === "hybrid" || value === "nurture" || value === "simple";
+}
+
+type BloomSettings = {
+  mode: BloomMode;
+  fullBloom: boolean;
+};
+
+function settingsOf(mode: BloomMode): BloomSettings {
+  return { mode, fullBloom: mode === "nurture" };
+}
+
 type BloomStore = {
   field: BloomField | null;
   pinnedId: string | null;
+  mode: BloomMode;
   fullBloom: boolean;
 };
 
 const DEFAULT_STORE: BloomStore = {
   field: null,
   pinnedId: null,
+  mode: "hybrid",
   fullBloom: false,
 };
 
@@ -42,42 +68,46 @@ type BloomContextValue = {
   getSnapshot: () => BloomStore;
   subscribe: (listener: () => void) => () => void;
   subscribeSettings: (listener: () => void) => () => void;
-  getSettingsSnapshot: () => { fullBloom: boolean };
+  getSettingsSnapshot: () => BloomSettings;
   register: (id: string, el: HTMLElement | null) => void;
   placeField: (x: number, y: number, sourceId: string, radius: number) => void;
   clearField: (sourceId: string) => void;
   togglePin: (id: string) => void;
-  setFullBloom: (fullBloom: boolean) => void;
+  setMode: (mode: BloomMode) => void;
+  cycleMode: () => void;
 };
 
-export function applyBloomDom(fullBloom: boolean) {
+export function applyBloomDom(mode: BloomMode) {
   const root = document.documentElement;
   root.style.setProperty("--bloom-scale", "1");
   root.classList.remove("bloom-off");
-  root.classList.toggle("full-bloom", fullBloom);
+  root.classList.toggle("full-bloom", mode === "nurture");
+  root.classList.toggle("bloom-simple", mode === "simple");
+  root.dataset.bloomMode = mode;
 }
 
-function persistBloom(fullBloom: boolean) {
+function persistMode(mode: BloomMode) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ fullBloom }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ mode }));
   } catch {
     /* ignore quota / private mode */
   }
 }
 
-function readStoredBloom(): { fullBloom: boolean } | null {
+function readStoredMode(): BloomMode {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
+    if (!raw) return "hybrid";
     const parsed = JSON.parse(raw) as {
+      mode?: unknown;
       fullBloom?: unknown;
       nurture?: unknown;
     };
-    return {
-      fullBloom: parsed.fullBloom === true || parsed.nurture === true,
-    };
+    if (isBloomMode(parsed.mode)) return parsed.mode;
+    if (parsed.fullBloom === true || parsed.nurture === true) return "nurture";
+    return "hybrid";
   } catch {
-    return null;
+    return "hybrid";
   }
 }
 
@@ -87,9 +117,7 @@ export function BloomProvider({ children }: { children: ReactNode }) {
   const storeRef = useRef<BloomStore>({ ...DEFAULT_STORE });
   const listenersRef = useRef(new Set<() => void>());
   const settingsListenersRef = useRef(new Set<() => void>());
-  const settingsRef = useRef({
-    fullBloom: false,
-  });
+  const settingsRef = useRef(settingsOf("hybrid"));
   const unitsRef = useRef(new Map<string, HTMLElement>());
 
   const emit = useCallback(() => {
@@ -114,9 +142,9 @@ export function BloomProvider({ children }: { children: ReactNode }) {
 
   const getSettingsSnapshot = useCallback(() => settingsRef.current, []);
 
-  const emitSettings = useCallback((fullBloom: boolean) => {
-    if (settingsRef.current.fullBloom === fullBloom) return;
-    settingsRef.current = { fullBloom };
+  const emitSettings = useCallback((mode: BloomMode) => {
+    if (settingsRef.current.mode === mode) return;
+    settingsRef.current = settingsOf(mode);
     settingsListenersRef.current.forEach((listener) => listener());
   }, []);
 
@@ -127,7 +155,7 @@ export function BloomProvider({ children }: { children: ReactNode }) {
 
   const placeField = useCallback(
     (x: number, y: number, sourceId: string, radius: number) => {
-      if (storeRef.current.fullBloom) return;
+      if (storeRef.current.mode !== "hybrid") return;
       storeRef.current = { ...storeRef.current, field: { x, y, radius, sourceId } };
       emit();
     },
@@ -146,7 +174,7 @@ export function BloomProvider({ children }: { children: ReactNode }) {
 
   const togglePin = useCallback(
     (id: string) => {
-      if (storeRef.current.fullBloom) return;
+      if (storeRef.current.mode !== "hybrid") return;
       const pinnedId = storeRef.current.pinnedId === id ? null : id;
       storeRef.current = { ...storeRef.current, pinnedId };
       emit();
@@ -154,29 +182,40 @@ export function BloomProvider({ children }: { children: ReactNode }) {
     [emit],
   );
 
-  const setFullBloom = useCallback(
-    (fullBloom: boolean) => {
-      persistBloom(fullBloom);
-      if (fullBloom) applyBloomDom(true);
+  const setMode = useCallback(
+    (mode: BloomMode) => {
+      persistMode(mode);
+      const from = storeRef.current.mode;
+      const fullBloom = mode === "nurture";
+      if (mode === "nurture" || mode === "simple") applyBloomDom(mode);
+      else if (from !== "nurture") applyBloomDom("hybrid");
       storeRef.current = {
         ...storeRef.current,
+        mode,
         fullBloom,
-        field: fullBloom ? null : storeRef.current.field,
-        pinnedId: fullBloom ? null : storeRef.current.pinnedId,
+        field: mode === "hybrid" ? storeRef.current.field : null,
+        pinnedId: mode === "hybrid" ? storeRef.current.pinnedId : null,
       };
       emit();
-      emitSettings(fullBloom);
+      emitSettings(mode);
     },
     [emit, emitSettings],
   );
 
+  const cycleMode = useCallback(() => {
+    setMode(nextBloomMode(storeRef.current.mode));
+  }, [setMode]);
+
   useEffect(() => {
-    const stored = readStoredBloom();
-    const fullBloom = stored?.fullBloom === true;
-    applyBloomDom(fullBloom);
-    storeRef.current = { ...storeRef.current, fullBloom };
+    const mode = readStoredMode();
+    applyBloomDom(mode);
+    storeRef.current = {
+      ...storeRef.current,
+      mode,
+      fullBloom: mode === "nurture",
+    };
     emit();
-    settingsRef.current = { fullBloom };
+    settingsRef.current = settingsOf(mode);
     settingsListenersRef.current.forEach((listener) => listener());
   }, [emit]);
 
@@ -232,7 +271,7 @@ export function BloomProvider({ children }: { children: ReactNode }) {
     }
 
     function onMove(event: PointerEvent) {
-      if (!storeRef.current.field || storeRef.current.fullBloom) return;
+      if (!storeRef.current.field || storeRef.current.mode !== "hybrid") return;
       next = { x: event.clientX, y: event.clientY };
       if (!raf) raf = requestAnimationFrame(flush);
     }
@@ -276,7 +315,8 @@ export function BloomProvider({ children }: { children: ReactNode }) {
       placeField,
       clearField,
       togglePin,
-      setFullBloom,
+      setMode,
+      cycleMode,
     }),
     [
       getSnapshot,
@@ -287,7 +327,8 @@ export function BloomProvider({ children }: { children: ReactNode }) {
       placeField,
       clearField,
       togglePin,
-      setFullBloom,
+      setMode,
+      cycleMode,
     ],
   );
 
@@ -341,6 +382,7 @@ export function SectionHeading({
       id={id}
       variant="meadow"
       pinOnClick={false}
+      decodeAll
       className="section-heading"
     >
       <h2 className="section-title">{children}</h2>
@@ -352,7 +394,7 @@ export function BloomUnit({
   id,
   variant = "meadow",
   pinOnClick = true,
-  decodeAll = false,
+  decodeAll = true,
   className,
   children,
 }: BloomUnitProps) {
@@ -372,7 +414,13 @@ export function BloomUnit({
     if (!unit) return;
 
     const sync = () => {
-      const { field, pinnedId, fullBloom } = getSnapshot();
+      const { field, pinnedId, fullBloom, mode } = getSnapshot();
+      if (mode === "simple") {
+        unit.removeAttribute("data-bloom");
+        unit.removeAttribute("data-decode");
+        syncUnitChars(unit, null, true);
+        return;
+      }
       if (
         fullBloom ||
         document.documentElement.classList.contains("full-bloom")
@@ -383,34 +431,24 @@ export function BloomUnit({
       const pinned = pinnedId === id;
       const isSource = field?.sourceId === id;
       const wasDecode = unit.hasAttribute("data-decode");
-      const hits =
-        pinned ||
-        (field
-          ? circleHitsRect(
-              unit.getBoundingClientRect(),
-              field.x,
-              field.y,
-              field.radius,
-            )
-          : false);
+      const active = pinned || Boolean(isSource);
 
-      unit.toggleAttribute("data-bloom", pinned || Boolean(isSource));
-      unit.toggleAttribute(
-        "data-decode",
-        hits || Boolean(decodeAll && isSource),
-      );
+      unit.toggleAttribute("data-bloom", active);
+      unit.toggleAttribute("data-decode", active);
 
-      if (!hits && !wasDecode && !pinned && !(decodeAll && isSource)) return;
+      if (!active && !wasDecode) return;
 
       const reduced = prefersReducedMotion();
-      if (pinned || (decodeAll && isSource)) syncUnitChars(unit, "all", reduced);
-      else if (hits && field) syncUnitChars(unit, field, reduced);
-      else syncUnitChars(unit, null, reduced);
+      if (active) {
+        syncUnitChars(unit, "all", reduced, true);
+      } else {
+        syncUnitChars(unit, null, reduced);
+      }
     };
 
     sync();
     return subscribe(sync);
-  }, [decodeAll, getSnapshot, id, subscribe]);
+  }, [getSnapshot, id, subscribe]);
 
   useEffect(() => {
     const unit = unitRef.current;
@@ -421,7 +459,7 @@ export function BloomUnit({
 
   const pointAt = useCallback(
     (clientX: number, clientY: number) => {
-      if (getSnapshot().fullBloom) return;
+      if (getSnapshot().mode !== "hybrid") return;
       placeField(
         clientX,
         clientY,
@@ -433,7 +471,7 @@ export function BloomUnit({
   );
 
   function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-    if (!pinOnClick) return;
+    if (!pinOnClick || getSnapshot().mode !== "hybrid") return;
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       togglePin(id);
@@ -442,7 +480,10 @@ export function BloomUnit({
 
   function onPointerLeave(event: ReactPointerEvent<HTMLDivElement>) {
     const next = event.relatedTarget;
-    if (next instanceof Element && next.closest("[data-bloom-id]")) return;
+    if (next instanceof Element) {
+      const nextUnit = next.closest("[data-bloom-id]");
+      if (nextUnit?.getAttribute("data-bloom-id") === id) return;
+    }
     clearField(id);
   }
 
@@ -473,7 +514,7 @@ export function BloomUnit({
         }
       }}
       onClick={(event) => {
-        if (!pinOnClick || getSnapshot().fullBloom) return;
+        if (!pinOnClick || getSnapshot().mode !== "hybrid") return;
         if ((event.target as HTMLElement).closest("a")) return;
         togglePin(id);
       }}

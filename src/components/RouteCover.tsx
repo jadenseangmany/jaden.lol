@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { useBloomSnapshot } from "@/components/bloom/Bloom";
 
 type RouteCoverApi = {
   go: (href: string) => void;
@@ -32,6 +33,7 @@ export function useRouteCover() {
 export function RouteCoverProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const { mode } = useBloomSnapshot();
   const pending = useRef<string | null>(null);
   const [phase, setPhase] = useState<"idle" | "cover" | "hold" | "reveal">(
     "idle",
@@ -40,14 +42,14 @@ export function RouteCoverProvider({ children }: { children: ReactNode }) {
   const go = useCallback(
     (href: string) => {
       if (pathname === href) return;
-      if (prefersReducedMotion()) {
+      if (mode === "simple" || prefersReducedMotion()) {
         router.push(href);
         return;
       }
       pending.current = href;
       setPhase("cover");
     },
-    [pathname, router],
+    [mode, pathname, router],
   );
 
   useEffect(() => {

@@ -32,7 +32,7 @@ export default async function LeadershipCasePage({
     <main id="main">
       <CaseStudy
         backHref="/#leadership"
-        backLabel="Leadership + Student Involvement"
+        backLabel="Leadership"
         bloomId={`case-${item.id}`}
         title={item.company}
         kicker={item.role}

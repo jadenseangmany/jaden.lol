@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, type RefObject } from "react";
+import { useBloomSnapshot } from "@/components/bloom/Bloom";
 import { syncUnitChars } from "@/components/bloom/chars";
 
 const HOLD_MS = [4000, 5000, 6000, 7000, 8000] as const;
@@ -19,6 +20,7 @@ export function useSyncedScramble(
   onAdvance: () => void,
   token: string,
 ) {
+  const { mode } = useBloomSnapshot();
   const onAdvanceRef = useRef(onAdvance);
   const rootsRef = useRef(rootRefs);
 
@@ -32,6 +34,11 @@ export function useSyncedScramble(
       .map((ref) => ref.current)
       .filter((node): node is HTMLElement => node != null);
     if (roots.length === 0) return;
+
+    if (mode === "simple") {
+      for (const root of roots) syncUnitChars(root, null, true);
+      return;
+    }
 
     const reduced = prefersReducedMotion();
     for (const root of roots) syncUnitChars(root, "all", reduced);
@@ -65,5 +72,5 @@ export function useSyncedScramble(
       window.clearTimeout(holdId);
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [token]);
+  }, [mode, token]);
 }

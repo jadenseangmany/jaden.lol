@@ -62,7 +62,7 @@ export function FullBloomDirector() {
       const scrollY = window.scrollY;
       const next: WaveItem[] = [];
       root.querySelectorAll<HTMLElement>("[data-bloom-char]").forEach((el) => {
-        if (el.closest(".nurture-toggle, .bloom-settings, .skill-items, .stat-items, .listening-hours, .listening-ask, .horizon")) return;
+        if (el.closest(".nurture-toggle, .mode-toggle, .bloom-settings, .skill-items, .stat-items, .case-row-more, .case-row-aside, .case-row-tags, .whisper, .award-row, .award-list, .listening-hours, .listening-ask, .horizon")) return;
         next.push({
           el,
           y: el.getBoundingClientRect().top + scrollY,
@@ -154,7 +154,7 @@ export function FullBloomDirector() {
         unit.removeAttribute("data-bloom");
       });
       releaseAllChars(root);
-      applyBloomDom(false);
+      applyBloomDom(getSettingsSnapshot().mode);
       setCanopy(false);
     }
 
@@ -163,7 +163,7 @@ export function FullBloomDirector() {
       exiting.current = false;
       active.current = true;
       setCanopy(true);
-      applyBloomDom(true);
+      applyBloomDom("nurture");
       measure();
       waveY.current = viewFront();
       paint();
@@ -214,7 +214,7 @@ export function FullBloomDirector() {
       exiting.current = false;
       active.current = true;
       setCanopy(true);
-      applyBloomDom(true);
+      applyBloomDom("nurture");
       if (waveY.current <= window.scrollY) {
         waveY.current = window.scrollY;
       }
@@ -228,14 +228,14 @@ export function FullBloomDirector() {
     }
 
     function startExit() {
-      if (prefersReducedMotion()) {
+      if (prefersReducedMotion() || getSettingsSnapshot().mode === "simple") {
         stop();
         return;
       }
       exiting.current = true;
       active.current = true;
       setCanopy(true);
-      applyBloomDom(true);
+      applyBloomDom("nurture");
       waveY.current = viewFront();
       measure();
       startLoop();
@@ -257,7 +257,11 @@ export function FullBloomDirector() {
       const on = getSettingsSnapshot().fullBloom;
       if (on === was) return;
       if (on) startWave();
-      else startExit();
+      else if (getSettingsSnapshot().mode === "simple" || prefersReducedMotion()) {
+        stop();
+      } else {
+        startExit();
+      }
       was = on;
     });
 

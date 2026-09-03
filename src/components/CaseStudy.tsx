@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { BloomUnit } from "@/components/bloom/Bloom";
-import type { CaseSection, Proof } from "@/lib/content";
+import type { CaseSection, ProjectLink, Proof } from "@/lib/content";
 
 export function CaseStudy({
   backHref,
@@ -13,6 +13,7 @@ export function CaseStudy({
   proof,
   stack,
   sections,
+  links,
 }: {
   backHref: string;
   backLabel: string;
@@ -24,6 +25,7 @@ export function CaseStudy({
   proof: readonly Proof[];
   stack: readonly string[];
   sections: readonly CaseSection[];
+  links?: readonly ProjectLink[];
 }) {
   return (
     <article className="page-main case-study">
@@ -42,6 +44,20 @@ export function CaseStudy({
           <h1 className="bloom-title">{title}</h1>
           {meta ? <p className="meta meta-start">{meta}</p> : null}
         </BloomUnit>
+        {links && links.length > 0 ? (
+          <p className="case-links">
+            {links.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {link.label}
+              </a>
+            ))}
+          </p>
+        ) : null}
         {proof.length > 0 ? (
           <dl className="proof-row">
             {proof.map((item) => (

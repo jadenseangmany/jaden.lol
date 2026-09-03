@@ -92,7 +92,7 @@ export function wrapBloomChars(node: ReactNode): ReactNode {
         : Array.isArray(props.className)
           ? props.className.filter(Boolean).join(" ")
           : "";
-    if (/\b(skill-items|stat-items)\b/.test(className)) return child;
+    if (/\b(skill-items|stat-items|case-row-more|whisper|case-row-aside|case-row-tags)\b/.test(className)) return child;
     if (props.children == null) return child;
     return cloneElement(child as ReactElement<{ children?: ReactNode }>, {
       children: wrapBloomChars(props.children),
@@ -173,7 +173,7 @@ export function wrapLooseText(root: ParentNode) {
       if (SKIP_WRAP.has(parent.tagName)) return NodeFilter.FILTER_REJECT;
       if (
         parent.closest(
-          "[data-bloom-char], .nurture-toggle, .bloom-settings, .pill-sizer, .skip-link, .route-cover, .skill-items, .stat-items, .listening-hours, .listening-ask, .horizon, .about-photo, svg",
+          "[data-bloom-char], .nurture-toggle, .mode-toggle, .bloom-settings, .pill-sizer, .skip-link, .route-cover, .skill-items, .stat-items, .case-row-more, .case-row-aside, .case-row-tags, .whisper, .award-row, .award-list, .listening-hours, .listening-ask, .horizon, .about-photo, svg",
         )
       ) {
         return NodeFilter.FILTER_REJECT;
@@ -207,6 +207,7 @@ export function syncUnitChars(
   unit: HTMLElement,
   field: BloomField | "all" | null,
   reduced: boolean,
+  together = false,
 ) {
   const root = unit.querySelector(".bloom-content") ?? unit;
   const chars = [
@@ -230,7 +231,8 @@ export function syncUnitChars(
       circleHitsRect(el.getBoundingClientRect(), field.x, field.y, field.radius);
 
     if (covered && !active) {
-      scrambleChar(el, Math.min(index, 16) * 20, reduced);
+      const delay = together ? 0 : Math.min(index, 16) * 20;
+      scrambleChar(el, delay, reduced);
     } else if (!covered && active) {
       releaseChar(el);
     }

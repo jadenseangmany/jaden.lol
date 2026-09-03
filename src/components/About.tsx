@@ -1,4 +1,5 @@
 import { BloomUnit, SectionHeading } from "@/components/bloom/Bloom";
+import { CaseCard } from "@/components/CaseCard";
 import { awards, education, papers, site, skills } from "@/lib/content";
 
 export function About() {
@@ -24,49 +25,41 @@ export function About() {
           </BloomUnit>
         </div>
         <SectionHeading id="heading-education">Education</SectionHeading>
-        <div className="about-block">
-          <h3>{education.school}</h3>
-          {education.degrees.map((degree) => (
-            <p key={degree}>{degree}</p>
-          ))}
-          <p className="meta meta-start">{education.dates}</p>
+        <div className="case-list education-list">
+          <div className="education-row">
+            <div className="case-row-copy">
+              <h3>{education.school}</h3>
+              <p className="case-card-kicker">{education.dates}</p>
+            </div>
+            {education.degrees.map((degree) => (
+              <p key={degree}>{degree}</p>
+            ))}
+          </div>
         </div>
         <SectionHeading id="heading-awards">Awards</SectionHeading>
-        <div className="award-list">
+        <div className="case-list award-list">
           {awards.map((award) => (
-            <BloomUnit
-              key={award.id}
-              id={`award-${award.id}`}
-              variant="meadow"
-              className="award-row"
-            >
-              <h3 className="bloom-title">{award.title}</h3>
-              {award.amount ? <p className="meta">{award.amount}</p> : null}
-            </BloomUnit>
+            <div className="award-row" key={award.id}>
+              <h3>{award.title}</h3>
+              {award.amount ? (
+                <p className="case-card-kicker">{award.amount}</p>
+              ) : null}
+            </div>
           ))}
         </div>
         <SectionHeading id="heading-papers">Papers</SectionHeading>
-        <div className="paper-list">
+        <div className="case-list paper-list">
           {papers.map((paper) => (
-            <BloomUnit
+            <CaseCard
               key={paper.id}
               id={`paper-${paper.id}`}
-              variant="meadow"
-              pinOnClick={false}
-              className="paper-unit"
-            >
-              <a
-                href={paper.href}
-                target="_blank"
-                rel="noreferrer"
-                className="paper-link"
-              >
-                <p className="whisper">( paper )</p>
-                <p className="case-kicker">{paper.venue}</p>
-                <h3 className="bloom-title">{paper.title}</h3>
-                <p className="meta meta-start">{paper.year}</p>
-              </a>
-            </BloomUnit>
+              href={paper.href}
+              title={paper.title}
+              kicker={paper.venue}
+              whisper="( paper )"
+              accent="meadow"
+              external
+            />
           ))}
         </div>
         <SectionHeading id="heading-skills">Skills</SectionHeading>

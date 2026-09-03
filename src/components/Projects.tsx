@@ -7,7 +7,7 @@ export function Projects() {
     <section id="projects" className="section">
       <div className="frame">
         <SectionHeading id="heading-projects">Projects</SectionHeading>
-        <div className="card-grid">
+        <div className="case-list">
           {projects.map((item) => (
             <CaseCard
               key={item.id}
@@ -15,11 +15,9 @@ export function Projects() {
               href={`/projects/${item.id}`}
               title={item.name}
               kicker={item.subtitle}
-              summary={item.summary}
-              meta={item.dates}
               whisper={item.whisper}
               accent={item.accent}
-              featured={item.featured}
+              tags={item.stack}
             />
           ))}
         </div>

@@ -7,12 +7,19 @@ alwaysApply: true
 
 Follow `AGENTS.md` as the source of truth.
 
-- **Rest** is default: Geist Sans for prose, headings, labels, dates; Geist Mono only for tokens and `.lol`.
-- **Bloom** is earned: hover/focus/pin on important units. The whole unit’s type becomes Instrument Serif, not just the heading.
+- **Hybrid** is default: Geist rest, bloom on hover/focus/pin. Geist Sans for prose, headings, labels, dates; Geist Mono only for tokens and `.lol`.
+- **Bloom** is earned in hybrid: hover/focus/pin on important units. The whole unit’s type becomes Instrument Serif, not just the heading. Size the serif slightly larger so it matches Geist optically.
 - Atmosphere is the cursor: a looking-up canopy sunburst at the pointer, not a trailing orb. Covered letters scramble in place, then decipher into Instrument Serif.
-- Full bloom is an opt-in masthead `nurture` control. It is not the default. Turning it on sweeps a procedural forest top to bottom with a scramble, then the canopy continues at a steady speed as the reader scrolls. No bloom on/off or size menu.
-- The glass pill nav (Home / Work / Projects / About) sticks to the top after the hero. About is a route, not a landing section.
+- Masthead cycles `hybrid` / `nurture` / `simple`. Hybrid default. Nurture is the page-wide canopy. Simple is Vercel-still (no scramble, grey row hover, no canopy cursor).
+- The glass pill nav (Home / Work / Projects / About) sticks to the top after the hero. About is a route, not a landing section. The rest glow marks the active section from scroll or route. Hover and focus lighten the label only, with no glow behind the hovered word.
 - Duality is ideology for the agent, not copy on the page.
 - Facts live in `src/lib/content.ts`. Do not invent resume content.
 - Recreate Nurture in CSS/SVG. Do not use album screenshots as UI.
+- Fun uses the same hairline rows as work, not cards.
+- Whisper tags like `( intern )` sit in the row next to Read more. They appear only in nurture, or in hybrid while the unit is highlighted.
+- Read more does not change size or typeface on hover.
+- Awards stay rest. They do not bloom.
+- Hero hover draws Nurture hairline streaks outward. No green glow fill.
+- Masthead `resume`, `email`, and the mode label share the same gap.
+- Leadership is ACM AI, ECES, CSE TA, and AWS. Other Involvement sits below Projects (Apple, Mastercard, ACM Projects Mentor).
 - Respect `prefers-reduced-motion`. Bloom is atmosphere, never information.

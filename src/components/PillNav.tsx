@@ -51,7 +51,7 @@ export function StickyPill() {
 export function PillNav() {
   const pathname = usePathname();
   const { go } = useRouteCover();
-  const { fullBloom } = useBloomSnapshot();
+  const { mode } = useBloomSnapshot();
   const trackRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef(new Map<string, HTMLAnchorElement>());
   const [homeActive, setHomeActive] = useState<(typeof nav)[number]["id"]>(
@@ -68,8 +68,6 @@ export function PillNav() {
 
   const activeId = pathname === "/" ? homeActive : activeFromPath(pathname);
 
-  const currentId = hoveredId ?? activeId;
-
   const placeGlow = useCallback((id: string) => {
     const track = trackRef.current;
     const item = itemRefs.current.get(id);
@@ -84,14 +82,14 @@ export function PillNav() {
   }, []);
 
   useLayoutEffect(() => {
-    placeGlow(currentId);
-  }, [currentId, placeGlow]);
+    placeGlow(activeId);
+  }, [activeId, placeGlow]);
 
   useEffect(() => {
-    const onResize = () => placeGlow(currentId);
+    const onResize = () => placeGlow(activeId);
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
-  }, [currentId, placeGlow]);
+  }, [activeId, placeGlow]);
 
   useEffect(() => {
     if (pathname !== "/") return;
@@ -121,7 +119,7 @@ export function PillNav() {
   function decode(id: string, on: boolean) {
     const item = itemRefs.current.get(id);
     if (!item) return;
-    syncUnitChars(item, on && !fullBloom ? "all" : null, prefersReducedMotion());
+    syncUnitChars(item, on && mode === "hybrid" ? "all" : null, prefersReducedMotion());
   }
 
   return (
@@ -130,7 +128,7 @@ export function PillNav() {
         <span
           className="pill-glow"
           aria-hidden="true"
-          data-bloom={!fullBloom && hoveredId ? "" : undefined}
+          data-bloom={mode === "nurture" ? "" : undefined}
           style={{
             opacity: glow.ready ? 1 : 0,
             width: glow.width,
@@ -142,7 +140,7 @@ export function PillNav() {
             key={item.id}
             href={pathname === "/" && item.hash ? item.hash : item.href}
             data-active={activeId === item.id ? "" : undefined}
-            data-bloom={!fullBloom && hoveredId === item.id ? "" : undefined}
+            data-bloom={mode === "hybrid" && hoveredId === item.id ? "" : undefined}
             ref={(node) => {
               if (node) itemRefs.current.set(item.id, node);
               else itemRefs.current.delete(item.id);

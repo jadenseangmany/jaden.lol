@@ -1,20 +1,19 @@
 import { CaseCard } from "@/components/CaseCard";
 import { SectionHeading } from "@/components/bloom/Bloom";
-import { fun } from "@/lib/content";
+import { otherInvolvement } from "@/lib/content";
 
-export function Fun() {
+export function Involvement() {
   return (
-    <section id="fun" className="section">
+    <section id="involvement" className="section">
       <div className="frame">
-        <SectionHeading id="heading-fun">Fun</SectionHeading>
+        <SectionHeading id="heading-involvement">Other Involvement</SectionHeading>
         <div className="case-list">
-          {fun.map((item) => (
+          {otherInvolvement.map((item) => (
             <CaseCard
               key={item.id}
               id={item.id}
-              href={item.href}
-              title={item.title}
-              kicker={item.kicker}
+              title={item.company}
+              kicker={item.role}
               whisper={item.whisper}
               accent={item.accent}
             />

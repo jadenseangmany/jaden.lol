@@ -1,37 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CaseCard } from "@/components/CaseCard";
-import { BloomUnit } from "@/components/bloom/Bloom";
-import { nonprofitWork, roleMeta } from "@/lib/content";
+import { nonprofitWork } from "@/lib/content";
 
 export function WorkMore() {
   const [open, setOpen] = useState(false);
+  const firstRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    firstRef.current?.querySelector("a")?.focus();
+  }, [open]);
 
   return (
     <>
-      <BloomUnit
-        id="work-more"
-        variant="meadow"
-        pinOnClick={false}
-        className="work-more-unit"
+      <div
+        id="nonprofit-work"
+        className={open ? "work-more-panel is-open" : "work-more-panel"}
+        aria-hidden={!open}
+        inert={!open}
       >
-        <button
-          type="button"
-          className="work-more"
-          aria-expanded={open}
-          aria-controls="nonprofit-work"
-          onClick={() => setOpen((value) => !value)}
-        >
-          <span className="whisper">( nonprofit )</span>
-          <span className="work-more-copy">
-            <span className="bloom-title">More</span>
-            <span className="meta">Non profit</span>
-          </span>
-        </button>
-      </BloomUnit>
-      <div id="nonprofit-work" className="work-more-panel" hidden={!open}>
-        <div className="card-grid">
+        <div className="work-more-panel-inner" ref={firstRef}>
           {nonprofitWork.map((job) => (
             <CaseCard
               key={job.id}
@@ -39,14 +29,26 @@ export function WorkMore() {
               href={`/work/${job.id}`}
               title={job.company}
               kicker={job.role}
-              summary={job.summary}
-              meta={roleMeta(job)}
               whisper={job.whisper}
               accent={job.accent}
             />
           ))}
         </div>
       </div>
+      {open ? null : (
+        <div className="show-more-wrap">
+          <button
+            type="button"
+            className="show-more"
+            aria-expanded={false}
+            aria-controls="nonprofit-work"
+            onClick={() => setOpen(true)}
+          >
+            <span className="show-more-label">Show more</span>
+            <span className="show-more-chevron" aria-hidden="true" />
+          </button>
+        </div>
+      )}
     </>
   );
 }

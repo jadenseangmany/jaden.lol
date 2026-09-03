@@ -41,6 +41,7 @@ export default async function ProjectCasePage({
         proof={item.proof}
         stack={item.stack}
         sections={item.sections}
+        links={item.links}
       />
     </main>
   );
