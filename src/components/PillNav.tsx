@@ -14,6 +14,7 @@ function prefersReducedMotion() {
 
 function activeFromPath(pathname: string) {
   if (pathname === "/about") return "nav-about" as const;
+  if (pathname.startsWith("/travel")) return "nav-about" as const;
   if (pathname.startsWith("/work")) return "nav-work" as const;
   if (pathname.startsWith("/projects")) return "nav-projects" as const;
   return "nav-home" as const;

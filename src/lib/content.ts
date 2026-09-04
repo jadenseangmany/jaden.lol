@@ -245,6 +245,32 @@ export const papers: readonly PaperItem[] = [
   },
 ];
 
+export const bio = {
+  intro:
+    "Hey! Thanks for viewing my page! I love focusing on fun things in life, and to me, that means going to raves, building fun stuff, trying new eats, meeting new people, and hanging out with friends and family.",
+  chat: "I love to chat about anything, so just send me a message in any of my contact information and I will likely respond immediately! And be sure to check out my ",
+} as const;
+
+export const personalFacts: readonly { label: string; value: string }[] = [
+  {
+    label: "Home",
+    value: "San Diego, California but born in Texas",
+  },
+  {
+    label: "Favorite food",
+    value: "Melon bread",
+  },
+  {
+    label: "Fun fact",
+    value: "I have 8 cats in my house and I've been to 28 countries",
+  },
+  {
+    label: "Hobbies",
+    value:
+      "Rock climbing, badminton, golfing, travelling, reading webtoons/manwha/manga & watching anime/movies, music/concerts/raves, geometry dash, cafes!!",
+  },
+];
+
 export type Proof = {
   value: string;
   label: string;
@@ -252,7 +278,7 @@ export type Proof = {
 
 export type CaseSection = {
   title: string;
-  copy: string;
+  copy: string | readonly string[];
 };
 
 export type WorkItem = {
@@ -484,24 +510,52 @@ export const projects: readonly ProjectItem[] = [
     ],
     sections: [
       {
-        title: "Outcome",
-        copy: "1st Place, Wildcard Track at DiamondHacks 2026 (largest hackathon in San Diego) among 400+ competitors.",
+        title: "Problem",
+        copy: [
+          "Formal usability testing is slow and expensive. Recruitment, scripts, and lab time put it out of reach for small teams.",
+          "That was concrete for us. We were designing a site for a sports nonprofit, sent surveys, and planned tests. Nobody responded. We tested on friends and roommates instead, and knew we were not hearing from real users.",
+          "AgentUX exists so a team can run persona-based tests on any website from a Chrome side panel, in minutes, without a research budget.",
+        ],
       },
       {
-        title: "Product",
-        copy: "Platform that automates usability testing with user customizable agentic personas tailored to target audiences.",
+        title: "What we built",
+        copy: [
+          "I built AgentUX with Manjusri Gobiraj, Alice Lan, and Khang Nguyen at DiamondHacks 2026. We took 1st Place in the Wildcard Track among 400+ competitors.",
+          "The product is a Manifest V3 side panel talking to a FastAPI backend. The backend runs a seven-step pipeline: summarize the page, generate tasks, assign them to personas, execute in parallel on Browser Use cloud agents, parse confusion from the traces, suggest CSS and JS fixes, then apply only what a human approves.",
+          "Personas include first-time visitors, elderly users, and custom ones you write. Ten or more can run at once. Live logs stream over WebSocket, color-coded by persona, with embedded live browser sessions so you can watch them get stuck.",
+        ],
       },
       {
-        title: "Orchestration",
-        copy: "Orchestrated 10+ parallel personas via Browser Use cloud agents, detecting 85%+ of known usability issues.",
+        title: "How it works",
+        copy: [
+          "Gemini turns a page summary into tasks you can edit or delete before anything runs. Each persona then navigates on its own.",
+          "The scoring engine reads agent output for hesitation, backtracks, retries, errors, frustration, and misclicks, then rolls those signals into a confusion heatmap and usability, accessibility, and clarity scores.",
+          "Suggested fixes are screenshot-checked with Playwright before they show up in Results. Approved edits save per domain in Chrome storage and re-inject on reload. You can also copy a structured prompt of every issue into an IDE.",
+        ],
       },
       {
-        title: "Scores",
-        copy: "Built a FastAPI + WebSocket pipeline, parsing agent trajectories into real-time confusion/hesitation scores.",
+        title: "Challenges",
+        copy: [
+          "Parallel cloud agents are useless if the panel goes dark. We had to keep REST, WebSockets, and the extension message relay in one progress model so setup, live feed, and results stayed one run.",
+          "Agent traces are prose, not click events. Scoring had to extract element hints and signal types from language, then aggregate them across personas without pretending the log was a perfect instrumentation feed.",
+          "LLM CSS and JS can look right and still break the page. Playwright before and after shots, plus human approval, were the only way we were willing to persist a fix.",
+          "All of that had to ship in a 24-hour hackathon. We were still debugging while standing in line for food.",
+        ],
       },
       {
-        title: "Fixes",
-        copy: "Validated Gemini-generated CSS/JS fixes via Playwright screenshots, injected live via Chrome content scripts.",
+        title: "Impact",
+        copy: [
+          "On known issues, the parallel personas found 85%+. Different personas failed in different places, which is the point of running them together instead of one scripted walkthrough.",
+          "The intended users are small businesses, nonprofits, and students who cannot staff a research pipeline. The landing site is agentux.dev.",
+        ],
+      },
+      {
+        title: "What I learned",
+        copy: [
+          "A usability score is only as good as the signals you can actually extract. Keyword traces are a start. They are not a substitute for real session replay.",
+          "Generated UI patches need a visual check and a person in the loop before they become durable. Shipping apply without approve would have been the wrong demo.",
+          "The product idea was the constraint. If testing requires a lab, most teams will skip it. The architecture had to fit in a side panel.",
+        ],
       },
     ],
   },
@@ -522,22 +576,57 @@ export const projects: readonly ProjectItem[] = [
       "Express",
       "MongoDB",
       "Yelp API",
+      "Google Maps",
     ],
     links: [
       { href: "https://github.com/jadenseangmany/decidr", label: "GitHub" },
     ],
     sections: [
       {
-        title: "Product",
-        copy: "Decidr picks a nearby restaurant so a group does not have to argue about where to eat. If the first pick is wrong, reroll for another option.",
+        title: "Problem",
+        copy: [
+          "Groups stall on where to eat. Someone names a 4.8 with three reviews. Someone else names a 4.5 with thousands. Nobody wants to pick wrong, so nobody picks.",
+          "Decidr is meant to end that loop. Open the app, get one nearby restaurant, reroll if it is wrong.",
+        ],
       },
       {
-        title: "Scoring",
-        copy: "A rating-count weighted algorithm scores nearby places so a 4.8 with three reviews does not beat a 4.5 with thousands of reviews.",
+        title: "What I built",
+        copy: [
+          "I built Decidr with ACM Hack Project Team 3: Khang Nguyen, Tom Situ, Sarthak Kapoor, Christine Le, Hoang Lam, and Katelyn Li.",
+          "The client is React Native and Expo in TypeScript. The server is Express talking to MongoDB, the Yelp Fusion API, and Google Maps for driving time. Users can filter by distance, cuisine, and price, then walk a ranked list instead of arguing over a map.",
+          "It is headed to the App Store and Google Play.",
+        ],
       },
       {
-        title: "Stack",
-        copy: "React Native and Expo on the client. Express, TypeScript, MongoDB, and the Yelp API on the server.",
+        title: "How it works",
+        copy: [
+          "The server pulls up to 50 nearby Yelp businesses, then sorts them with a review-count weighted rating. Each place is pulled toward the local average until it has enough reviews (we used 100 as the trust threshold), so a thin 4.8 does not beat a well-reviewed 4.5.",
+          "Reroll is an index into that ranked list, wrapping around the bounds, so the next tap is the next strong option rather than a new random draw from the whole city.",
+          "When we have the user's coordinates, we attach driving time from Google Maps so the pick is not only high-rated, it is actually reachable.",
+        ],
+      },
+      {
+        title: "Challenges",
+        copy: [
+          "Raw Yelp stars are a bad ranking. The hard part was encoding credibility without hiding new places forever. Shrinking toward the local mean was the compromise we could explain and ship.",
+          "Location is messy on a phone. The API has to accept a named location or a lat/lng pair, convert miles to a Yelp radius cap, and still fail clearly when neither is present.",
+          "Always returning the top row makes reroll feel broken. Ranking first, then stepping through the list, kept quality without repeating the same restaurant.",
+        ],
+      },
+      {
+        title: "Impact",
+        copy: [
+          "Decidr turns a group deadlock into one recommendation with an obvious next action. Filters for cuisine, price, and distance keep the pick inside constraints people actually have.",
+          "The next step is the store listing. The GitHub repo is the current source of truth until that ships.",
+        ],
+      },
+      {
+        title: "What I learned",
+        copy: [
+          "A recommender for friends is a ranking problem, not a search UI. If the first result is statistically noisy, the whole app feels like a coin flip.",
+          "Variety has to be designed. Random from the full set throws away the ranking. Indexing a sorted list keeps both.",
+          "Client and server stay honest when the product is location plus a third-party API. The phone collects context. The server owns scoring, secrets, and driving time.",
+        ],
       },
     ],
   },
@@ -569,12 +658,49 @@ export const projects: readonly ProjectItem[] = [
     ],
     sections: [
       {
-        title: "Site",
-        copy: "Official website of ACM AI at UC San Diego, an inclusive community of students interested in artificial intelligence.",
+        title: "Problem",
+        copy: [
+          "ACM AI is an inclusive community of students at UC San Diego interested in artificial intelligence. Workshops, competitions, socials, and projects only work if people can find them, join them, and come back next year.",
+          "A Discord and a quarterly flyer do not scale to thousands of students. The org needed a public site that is also a membership surface.",
+        ],
       },
       {
-        title: "Reach",
-        copy: "7,000+ users, with 1,000+ new users every year.",
+        title: "What I built",
+        copy: [
+          "ai.acmucsd.com is the official ACM AI site. I lead the org as president, and I treat this site as the product people actually touch: about, events, competitions, projects, and account login and registration.",
+          "The frontend is React and TypeScript with Ant Design and React Router, talking to a separate API over Axios. Chart.js shows competition and community stats. Local development wires to an Express API and a MongoDB container.",
+          "The repo is maintained by ACM AI's development team. New pages have to land as routes in App.tsx so the site stays one app as board members turn over.",
+        ],
+      },
+      {
+        title: "How it works",
+        copy: [
+          "Public pages cover the org, events, competitions, and projects. Auth pages handle login, registration, and password reset so members have a durable account instead of a one-off form.",
+          "Workshop material lives in the ACM AI wiki, linked from the site, so talks from AI School (data preprocessing, computer vision, deep learning) stay reachable after the quarter ends.",
+        ],
+      },
+      {
+        title: "Challenges",
+        copy: [
+          "This is a long-lived Create React App codebase with rewired webpack, Less, and Ant Design. Shipping a feature means respecting an architecture that predates the current board.",
+          "The site and the API are separate. Local setup needs a Mongo container and a director-gated backend, which is the right split for student credentials, yet it makes onboarding slower than a single repo.",
+          "Student orgs rotate. If routing, content, and contribution rules are implicit, the site rots between presidents. Making the path to a new page obvious was part of keeping it alive.",
+        ],
+      },
+      {
+        title: "Impact",
+        copy: [
+          "The site serves 7,000+ users, with 1,000+ new users every year. That is the funnel into workshops, competitions, and projects for the org.",
+          "As president I also run the board and events side (25+ board members, 30+ events, 10,000+ students a year). The site is how that scale stays legible to someone who has never heard of ACM AI.",
+        ],
+      },
+      {
+        title: "What I learned",
+        copy: [
+          "Org software is a maintenance problem. The useful work is often a route, a copy pass, or an API contract that the next developer can find.",
+          "Reach is the metric that matters here, not novelty in the stack. 7,000+ accounts means broken auth or a missing events page is a community failure, not a side project bug.",
+          "Leading the org and owning the site are the same job from the reader's side. They do not care which repo shipped the button. They care that the event exists and they can join.",
+        ],
       },
     ],
   },
@@ -597,12 +723,50 @@ export const projects: readonly ProjectItem[] = [
     ],
     sections: [
       {
-        title: "Product",
-        copy: "PromptShield scans ChatGPT messages and pastes in the browser and blocks credit cards, Social Security numbers, API keys, and other sensitive data before submit.",
+        title: "Problem",
+        copy: [
+          "People paste into ChatGPT the same way they paste into Notes. Credit cards, Social Security numbers, API keys, and passwords go out with one Enter.",
+          "Once that text hits the model, you do not get it back. PromptShield is a last chance to stop the send.",
+        ],
       },
       {
-        title: "Privacy",
-        copy: "Detection runs locally. No analytics and no external requests.",
+        title: "What I built",
+        copy: [
+          "PromptShield is a Manifest V3 Chrome extension I published on the Chrome Web Store. It injects into chat.openai.com and chatgpt.com, scans the prompt and pastes, and blocks submit when it finds sensitive data.",
+          "Detection covers six categories: Luhn-validated credit cards, Social Security numbers with area/group/serial checks, phone numbers, emails, API keys (OpenAI, AWS, GitHub, Stripe, Slack, and similar prefixes), and plaintext passwords.",
+          "A warning overlay names what was found. You can go back and edit, or redact and send. Categories toggle in the popup. A status badge on the page shows whether protection is on.",
+        ],
+      },
+      {
+        title: "How it works",
+        copy: [
+          "The detector is a local pattern engine. Cards have to pass Luhn. SSNs reject 000, 666, and 9xx area numbers, plus all-zero groups and serials. Keys match known prefixes rather than any long token.",
+          "The content script intercepts Enter (without Shift) and send-button clicks in the capture phase, before ChatGPT handles them. Paste is scanned the same way. ChatGPT's input is a contenteditable prompt box, not a quiet textarea, so read and write have to speak both DOM shapes.",
+          "Redaction replaces matches with labeled placeholders and re-submits. Nothing leaves the machine. There are no analytics, no tracking, and no network calls from the extension.",
+        ],
+      },
+      {
+        title: "Challenges",
+        copy: [
+          "ChatGPT's DOM moves. The script has to find #prompt-textarea, a contenteditable, or a textarea, and a send button by test id or aria-label. Tight selectors die. Loose selectors fire on the wrong control.",
+          "Interception has to win the event race. Listening in capture, and using a processing flag so redact-and-send does not recurse, was the difference between a block and a no-op.",
+          "False positives make people uninstall. Luhn and SSN structure rules exist so a long number is not treated like a card. The remaining tension is emails and phones, which are sensitive in some prompts and the whole point of others, which is why categories are toggleable.",
+        ],
+      },
+      {
+        title: "Impact",
+        copy: [
+          "The extension is published on the Chrome Web Store, so protection is an install rather than a developer-mode load.",
+          "The privacy claim is the product. If PromptShield uploaded prompts to score them, it would be another place to leak. Local patterns are slower to evolve and safer to trust.",
+        ],
+      },
+      {
+        title: "What I learned",
+        copy: [
+          "A content script on a site you do not own is a contract with someone else's markup. Defensive queries and capture-phase listeners are the job, not polish.",
+          "Security UX has to offer a path through the block. Redact and send keeps the workflow. A dead-end warning trains people to disable the tool.",
+          "Zero data collection is a design constraint. It ruled out a server-side model and forced the detector to be boring, inspectable JavaScript.",
+        ],
       },
     ],
   },
@@ -629,20 +793,50 @@ export const projects: readonly ProjectItem[] = [
     ],
     sections: [
       {
-        title: "Client",
-        copy: "Built with guidance from Dr. Charles Goldberg, a clinical professor at UC San Diego, as an educational tool for Type 2 diabetes prevention.",
+        title: "Problem",
+        copy: [
+          "Type 2 diabetes is preventable. Type 1 is not. Kids still meet the topic late, if at all, and the science is easy to flatten into eat this, not that.",
+          "Dr. Charles Goldberg, a clinical professor at UC San Diego, asked for an educational tool that could live in places like a clinic waiting room: short, age-appropriate, and actually fun for children 8 to 13.",
+        ],
       },
       {
-        title: "Goal",
-        copy: "A fun game for children aged 8 to 13 that simulates packing a nutritious lunch and teaching how nutrients and balance contribute to well-being.",
+        title: "What I built",
+        copy: [
+          "Diabeatit is a larger educational game with mini-games around meals, movement, and moderation. I worked on the Lunchbox mini-game, a Spring 2025 continuation of an earlier lunch-packing prototype, in Unity and C# with a WebGL build.",
+          "The team split into Development, Design, and Operations. Development continued Lunchbox. Design prototyped Sugar Savers, a two-team insulin and glucose game on a body map, inspired by Among Us, that was not this repo's ship target.",
+          "Lunchbox is playable on Unity Play as Lunch-BoxWebGL.",
+        ],
       },
       {
-        title: "Lunchbox",
-        copy: "Players learn food categories, nutrients, and health benefits, then build a balanced meal with real-time feedback that rewards thoughtful choices.",
+        title: "How it works",
+        copy: [
+          "Players see food categories, nutrients, and what those nutrients do, then pack a lunch. The scoring cares about balance across groups, not a single hero food.",
+          "Feedback is real-time. You can change the box and watch the score move, which is the lesson: thoughtful choices compound, and you get to revise.",
+          "The waiting-room constraint shaped the loop. A session has to teach something before a name is called, which is why WebGL and a tight packing puzzle mattered more than a long campaign.",
+        ],
       },
       {
-        title: "Why",
-        copy: "Unlike Type 1 diabetes, Type 2 is preventable. Diabeatit turns nutrition and activity into an age-appropriate game so children can meet the topic in places like a clinic waiting room.",
+        title: "Challenges",
+        copy: [
+          "Clinical accuracy and an 8-year-old audience fight each other. We had to talk about Type 2 prevention without fear, and without implying diabetes is a moral failure.",
+          "A high score that only rewards restriction teaches the wrong habit. The design wants balance across food groups, with room to adjust after feedback rather than a fail state.",
+          "Two workstreams in one quarter (Lunchbox in development, Sugar Savers in design) meant protecting the playable path. Lunchbox had to remain a complete mini-game even while the broader Diabeatit story was still being invented.",
+        ],
+      },
+      {
+        title: "Impact",
+        copy: [
+          "The game gives clinics and classrooms a way to put Type 2 prevention in a child's hands instead of a pamphlet. Packing a lunch is a concrete action they already understand.",
+          "Guidance from Dr. Goldberg kept the content aligned with how this is actually taught, not how engineers guess it should be taught.",
+        ],
+      },
+      {
+        title: "What I learned",
+        copy: [
+          "Educational games fail when the mechanic and the lesson disagree. If the fun is speed and the lesson is balance, players learn speed.",
+          "Client work with a clinician is a constraint on tone. Every sentence in the UI is part of the medical communication, not flavor text.",
+          "Shipping a mini-game inside a larger vision means cutting. Lunchbox had to be complete on its own. Sugar Savers could stay a prototype without blocking the WebGL build.",
+        ],
       },
     ],
   },

@@ -2,6 +2,10 @@ import Link from "next/link";
 import { BloomUnit } from "@/components/bloom/Bloom";
 import type { CaseSection, ProjectLink, Proof } from "@/lib/content";
 
+function paragraphs(copy: CaseSection["copy"]) {
+  return typeof copy === "string" ? [copy] : copy;
+}
+
 export function CaseStudy({
   backHref,
   backLabel,
@@ -71,7 +75,9 @@ export function CaseStudy({
         {sections.map((section) => (
           <section key={section.title} className="case-block">
             <h2>{section.title}</h2>
-            <p>{section.copy}</p>
+            {paragraphs(section.copy).map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
           </section>
         ))}
         {stack.length > 0 ? (

@@ -44,23 +44,11 @@ function rankQuery(query: string, rows: CatalogRow[]) {
   return scored.slice(0, 8).map((item) => item.row);
 }
 
-export function ListeningExplorer({
-  windows,
-  covers,
-}: {
-  windows: HistoryWindow[];
-  covers: Record<string, string>;
-}) {
-  const [selected, setSelected] = useState<WindowId>("year");
+export function ListeningAsk() {
   const [query, setQuery] = useState("");
   const [catalog, setCatalog] = useState<CatalogRow[] | null>(null);
   const [liveCovers, setLiveCovers] = useState<Record<string, string>>({});
   const fetchedIds = useRef(new Set<string>());
-
-  const current =
-    windows.find((item) => item.id === selected) ??
-    windows.find((item) => item.id === "all") ??
-    windows[0];
 
   const matches = useMemo(() => {
     if (!catalog) return [];
@@ -84,15 +72,13 @@ export function ListeningExplorer({
   }, [catalog, query]);
 
   useEffect(() => {
-    if (!current) return;
-    const ids = [
-      ...current.tracks.map((row) => row.id),
-      ...matches.map((row) => row[0]),
-    ].filter((id) => {
-      if (!/^[A-Za-z0-9]{22}$/.test(id)) return false;
-      if (covers[id] || liveCovers[id] || fetchedIds.current.has(id)) return false;
-      return true;
-    });
+    const ids = matches
+      .map((row) => row[0])
+      .filter((id) => {
+        if (!/^[A-Za-z0-9]{22}$/.test(id)) return false;
+        if (liveCovers[id] || fetchedIds.current.has(id)) return false;
+        return true;
+      });
     if (!ids.length) return;
     ids.forEach((id) => fetchedIds.current.add(id));
     const ctrl = new AbortController();
@@ -110,7 +96,107 @@ export function ListeningExplorer({
       ctrl.abort();
       globalThis.clearTimeout(timer);
     };
-  }, [covers, current, liveCovers, matches]);
+  }, [liveCovers, matches]);
+
+  const searchRows: CountRow[] = matches.map((row) => ({
+    id: row[0],
+    name: row[1],
+    artists: row[2],
+    plays: row[3],
+    minutes: 0,
+    url: trackUrl(row[0]),
+    image: liveCovers[row[0]] ?? null,
+  }));
+
+  return (
+    <section className="listening-ask" aria-label="Search listening history">
+      <label className="listening-ask-field">
+        <span className="listening-ask-label">check if i listened to a song</span>
+        <span className="listening-ask-icon" aria-hidden="true">
+          <svg viewBox="0 0 16 16" width="15" height="15">
+            <circle
+              cx="6.5"
+              cy="6.5"
+              r="4.25"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.25"
+            />
+            <path
+              d="M9.6 9.6 14 14"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.25"
+              strokeLinecap="round"
+            />
+          </svg>
+        </span>
+        <input
+          id="listening-query"
+          type="search"
+          autoComplete="off"
+          spellCheck={false}
+          value={query}
+          placeholder="check if i listened to a song"
+          onChange={(event) => setQuery(event.target.value)}
+        />
+      </label>
+      {query.trim().length >= 2 ? (
+        catalog == null ? (
+          <p className="listening-empty">Looking through the history.</p>
+        ) : searchRows.length ? (
+          <CountList rows={searchRows} />
+        ) : (
+          <p className="listening-empty">No plays of that in this history.</p>
+        )
+      ) : null}
+    </section>
+  );
+}
+
+export function ListeningExplorer({
+  windows,
+  covers,
+}: {
+  windows: HistoryWindow[];
+  covers: Record<string, string>;
+}) {
+  const [selected, setSelected] = useState<WindowId>("year");
+  const [liveCovers, setLiveCovers] = useState<Record<string, string>>({});
+  const fetchedIds = useRef(new Set<string>());
+
+  const current =
+    windows.find((item) => item.id === selected) ??
+    windows.find((item) => item.id === "all") ??
+    windows[0];
+
+  useEffect(() => {
+    if (!current) return;
+    const ids = current.tracks
+      .map((row) => row.id)
+      .filter((id) => {
+        if (!/^[A-Za-z0-9]{22}$/.test(id)) return false;
+        if (covers[id] || liveCovers[id] || fetchedIds.current.has(id)) return false;
+        return true;
+      });
+    if (!ids.length) return;
+    ids.forEach((id) => fetchedIds.current.add(id));
+    const ctrl = new AbortController();
+    const timer = globalThis.setTimeout(() => {
+      fetch(`/api/spotify/covers?ids=${ids.join(",")}`, { signal: ctrl.signal })
+        .then((res) => (res.ok ? res.json() : {}))
+        .then((next: Record<string, string>) => {
+          setLiveCovers((prev) => ({ ...prev, ...next }));
+        })
+        .catch(() => {
+          ids.forEach((id) => fetchedIds.current.delete(id));
+        });
+    }, 80);
+    return () => {
+      ctrl.abort();
+      globalThis.clearTimeout(timer);
+    };
+  }, [covers, current, liveCovers]);
 
   if (!current) return null;
 
@@ -120,16 +206,6 @@ export function ListeningExplorer({
     tracks: paintCovers(current.tracks, mergedCovers),
     artists: paintCovers(current.artists, mergedCovers),
   };
-
-  const searchRows: CountRow[] = matches.map((row) => ({
-    id: row[0],
-    name: row[1],
-    artists: row[2],
-    plays: row[3],
-    minutes: 0,
-    url: trackUrl(row[0]),
-    image: mergedCovers[row[0]] ?? null,
-  }));
 
   function onHorizonKey(event: KeyboardEvent<HTMLDivElement>) {
     const ids = windows.map((item) => item.id);
@@ -149,34 +225,6 @@ export function ListeningExplorer({
 
   return (
     <>
-      <section className="listening-ask" aria-label="Search listening history">
-        <label htmlFor="listening-query" className="listening-ask-label">
-          Check if I listened to
-        </label>
-        <input
-          id="listening-query"
-          type="search"
-          autoComplete="off"
-          spellCheck={false}
-          value={query}
-          placeholder="a song"
-          onChange={(event) => setQuery(event.target.value)}
-        />
-        {query.trim().length >= 2 ? (
-          catalog == null ? (
-            <p className="listening-empty">Looking through the history.</p>
-          ) : searchRows.length ? (
-            <CountList rows={searchRows} />
-          ) : (
-            <p className="listening-empty">No plays of that in this history.</p>
-          )
-        ) : (
-          <p className="listening-caption">
-            Type a title or artist. Counts are plays over 30 seconds, same as Wrapped.
-          </p>
-        )}
-      </section>
-
       <div
         className="horizon"
         role="radiogroup"

@@ -1,6 +1,7 @@
+import Link from "next/link";
 import { BloomUnit, SectionHeading } from "@/components/bloom/Bloom";
-import { CaseCard } from "@/components/CaseCard";
-import { awards, education, papers, site, skills } from "@/lib/content";
+import { Countries } from "@/components/Countries";
+import { bio, education, personalFacts, site, skills } from "@/lib/content";
 
 export function About() {
   return (
@@ -24,6 +25,37 @@ export function About() {
             <p className="about-pronouns">{site.pronouns}</p>
           </BloomUnit>
         </div>
+        <div className="about-bio">
+          <p>{bio.intro}</p>
+          <p>
+            {bio.chat}
+            <Link href="/matcha">matcha rankings</Link>
+            !!!
+          </p>
+          <p className="about-contact">
+            <a href={`mailto:${site.email}`}>{site.email}</a>
+            <a href={site.linkedin} target="_blank" rel="noreferrer">
+              LinkedIn
+            </a>
+            <a href={site.github} target="_blank" rel="noreferrer">
+              GitHub
+            </a>
+            <a href={site.phoneHref}>{site.phone}</a>
+          </p>
+        </div>
+        <div className="about-facts">
+          {personalFacts.map((fact) => (
+            <div className="about-fact" key={fact.label}>
+              <p className="about-fact-label">{fact.label}</p>
+              <p className="about-fact-value">
+                {fact.label === "Fun fact"
+                  ? `${fact.value} (see country list below)`
+                  : fact.value}
+              </p>
+            </div>
+          ))}
+        </div>
+        <Countries />
         <SectionHeading id="heading-education">Education</SectionHeading>
         <div className="case-list education-list">
           <div className="education-row">
@@ -35,32 +67,6 @@ export function About() {
               <p key={degree}>{degree}</p>
             ))}
           </div>
-        </div>
-        <SectionHeading id="heading-awards">Awards</SectionHeading>
-        <div className="case-list award-list">
-          {awards.map((award) => (
-            <div className="award-row" key={award.id}>
-              <h3>{award.title}</h3>
-              {award.amount ? (
-                <p className="case-card-kicker">{award.amount}</p>
-              ) : null}
-            </div>
-          ))}
-        </div>
-        <SectionHeading id="heading-papers">Papers</SectionHeading>
-        <div className="case-list paper-list">
-          {papers.map((paper) => (
-            <CaseCard
-              key={paper.id}
-              id={`paper-${paper.id}`}
-              href={paper.href}
-              title={paper.title}
-              kicker={paper.venue}
-              whisper="( paper )"
-              accent="meadow"
-              external
-            />
-          ))}
         </div>
         <SectionHeading id="heading-skills">Skills</SectionHeading>
         <div className="skills">

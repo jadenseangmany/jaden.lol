@@ -19,7 +19,7 @@ The site has two visual languages that coexist, plus an explicit simple rest:
 
 Duality (simple/complex, bland/elegant, static/animated) is ideology for how the system behaves. It is not page copy. Do not render those pairings.
 
-A masthead control cycles **hybrid**, **nurture**, and **simple**. Hybrid is the default. Never ship hybrid as fully Nurture, and never remove bloom from hybrid.
+A masthead control cycles **hybrid**, **nurture**, and **simple**. Simple is the default. Never ship hybrid as fully Nurture, and never remove bloom from hybrid.
 
 ---
 
@@ -37,11 +37,11 @@ If the reader saw only the first viewport, they should remember the name, the ro
 
 Treat rest and bloom as one system with two modes, not two themes, except for the masthead cycle.
 
-**Hybrid** (default) — Rest until hover, focus, or pin. Hover scrambles, then Instrument Serif. Canopy cursor. Work rows sweep a meadow wash.
+**Hybrid** — Rest until hover, focus, or pin. Hover scrambles, then Instrument Serif. Canopy cursor. Work rows sweep a meadow wash.
 
 **Nurture** — Opt-in page-wide field. Top-to-bottom scramble into Instrument Serif and the procedural canopy, then the canopy keeps pace with scroll.
 
-**Simple** — Vercel rest only. No scramble, no canopy cursor, no Instrument swap. Row hover is a light grey wash.
+**Simple** (default) — Vercel rest only. No scramble, no canopy cursor, no Instrument swap. Row hover is a light grey wash.
 
 | | Rest (Vercel) | Bloom (Nurture) |
 |---|---|---|
@@ -60,7 +60,7 @@ The bloom atmosphere is the **cursor itself**: a looking-up canopy sunburst at t
 
 Click/tap **pins** bloom on units that stay on the page (hero, about portrait and name, other-involvement rows, AWS campus ambassador, contact). Work, leadership, project, Fun rows, and papers navigate instead of pinning. Focus-visible must bloom; do not rely on hover alone.
 
-A quiet masthead control cycles `hybrid` / `nurture` / `simple`. Hybrid is the default. Nurture is the page-wide field. Simple is Vercel-still: no scramble, grey row hover, no canopy cursor. The control shows the current mode.
+A quiet masthead control cycles `hybrid` / `nurture` / `simple`. Simple is the default. Nurture is the page-wide field. Hybrid blooms on hover. Simple is Vercel-still: no scramble, grey row hover, no canopy cursor. The control shows the current mode. A sun/moon control beside it toggles light and dark rest. Dark is the default. On a first visit, a green hairline arrow points at the mode word with “try clicking here!”
 
 **Do not** autoplay Nurture on load or on scroll. **Do not** leave hover bloom on after the pointer leaves unless it is pinned. Nurture only happens when the reader turns it on. Simple is opt-in rest.
 
@@ -74,19 +74,21 @@ Respect `prefers-reduced-motion: reduce`: keep the color/type shift, drop path-d
 
 Landing page plus case routes. Shared 12-column outer grid (6 tablet, 4 mobile). Hairline column rules may exist in rest as a quiet Vercel cue; they should recede or dissolve in a bloomed unit.
 
-1. **Masthead** — Overlay on the hero. Wordmark `jaden.lol` left. Resume, email, and the mode control (`hybrid` / `nurture` / `simple`) right, with the same gap between all three. Primary nav lives in the hero pill, not here.
+1. **Masthead** — Overlay on the hero. Wordmark `jaden.lol` left. Resume, email, the mode control (`hybrid` / `nurture` / `simple`), and a sun/moon theme toggle right, with the same gap between all four. Primary nav lives in the hero pill, not here. First visit only: a green Nurture hairline arrow under the mode word says `try clicking here!`
 2. **Opening** — Full first viewport, centered. On `/` in hybrid, the greeting starts as `Super nice to meet you! I'm Jaden.` and the line under it starts as `I'm a software engineer!`. They scramble together every 4 to 8 seconds. Each list is a shuffle without replacement: every greeting and every line appears once per cycle before the deck reshuffles, and the new cycle does not start on the line that just ended. Reload always returns to English plus `I'm a software engineer!`. Simple freezes that first pair with no scramble. Then a glass capsule nav (Home, Work, Projects, About). The pill starts in the hero and **follows on scroll** (fixed to the top). A rest glow sits behind the active section (scroll on `/`, route elsewhere). Hover and focus lighten the label only and do not move that glow. Hovering the name turns the pointer into the canopy bloom.
 3. **Work** — Full-width hairline rows in the Vercel careers pattern, in this order: Capital One, Cubic, CDC. Company is the title, role is the muted line under it. Row copy has 24px inline padding (between-group). `( intern )` / `( research )` tags sit to the left of **Read more** and appear only in nurture, or in hybrid while the row is highlighted. No dates or summaries in the list. Click opens `/work/[id]`. Below the list, Geist **Show more** (not a job row) reveals Associated Students, UC San Diego Health, and UCSD Cognitive Science. The trigger disappears; the extra rows ease in. No Show Less.
 4. **Leadership** — Same row system: ACM AI President, ECES Vice President, CSE Department TA, and AWS Campus Ambassador. Leadership rows open `/leadership/[id]` with Read more. AWS pins and has no pill. Not in the pill nav.
 5. **Projects** — Same row system. Company-style title, muted subtitle, Geist Mono stack tags on the row. AgentUX, Decidr, ACM AI Site, PromptShield, and Diabeatit Lunchbox each open `/projects/[id]`.
 6. **Other Involvement** — Below projects. Pin rows, company as the white title, program as the muted line: Apple / Next-Gen Innovator Program, Mastercard / Mentorship Program, ACM / Projects Mentor.
-7. **Fun** — Two destination rows after other involvement: Listening (`/listening`) and Matcha (`/matcha`). Same hairline row system as work. Not in the pill.
-8. **About** — Not on the landing page. Pill **About** sweeps a meadow cover top to bottom, then `/about` (portrait top left, full name, He/Him, education, awards, papers, skills). Portrait is grayscale in rest and color on hover/focus/pin. Education, awards, and papers use the same hairline rows. Award rows stay rest and do not bloom. Papers open the journal link with Read more. Skills stay rest (lookup, not a moment). No coursework on the page.
-9. **Case pages** — Proof first, then sections from `content.ts`. Project cases also link out to GitHub and live URLs from `content.ts`. No invented metrics.
-10. **Matcha ranking** — Hairline cards with a shop photo and rank. Click opens `/matcha/[id]`, a visit page for the blog and photos. Write copy in `src/lib/matcha.ts` (`body`). Cover photos live in `public/matcha/{id}.jpg`. Extra visit photos go in `public/matcha/{id}/`. Do not invent tasting notes.
-11. **Close** — Email, GitHub, LinkedIn, phone as text links. Quiet footer. No Vercel triangle, no fake brand chrome.
+7. **Papers** — After other involvement on the landing page. Same hairline rows. Open the journal link with Read more. Not in the pill.
+8. **Awards** — After papers. Hairline rows. Stay rest and do not bloom.
+9. **Fun** — Last landing section. Two destination rows: Listening (`/listening`) and Matcha (`/matcha`). Same hairline row system as work. Not in the pill.
+10. **About** — Not on the landing page. Pill **About** sweeps a meadow cover top to bottom, then `/about` (portrait top left, full name, He/Him, bio, personal facts, Countries, education, skills). Portrait is grayscale in rest and color on hover/focus/pin. Education uses the same hairline rows. Personal facts stay rest, same labeled rows as skills. Countries group by region with text links to `/travel/[id]`. Write visit copy in `src/lib/travel.ts` (`body`). Do not invent trip notes. Skills stay rest (lookup, not a moment). No papers or awards on About. No coursework on the page.
+11. **Case pages** — Proof first, then sections from `content.ts`. Project cases are long-form from the READMEs and given briefs: problem, build, challenges, impact, learned. They also link out to GitHub and live URLs from `content.ts`. No invented metrics.
+12. **Matcha ranking** — Hairline cards with a shop photo and a Top N label (Top 1, Top 2). Do not print “of N”. Click opens `/matcha/[id]`, a visit page for the blog and photos. Write copy in `src/lib/matcha.ts` (`body`). Cover photos live in `public/matcha/{id}.jpg`. Extra visit photos go in `public/matcha/{id}/`. Do not invent tasting notes. Current top four: 12matcha, rōk, Chagee, Molly Tea.
+13. **Close** — Email, GitHub, LinkedIn, phone as text links. Quiet footer. No Vercel triangle, no fake brand chrome.
 
-Reject: centered generic hero, badge pills, nested cards-in-cards, icon tiles, gradient text, auto-playing typewriter, marquee, particle libraries, stock photos of the album, and a visible light/dark switcher. Dark rest is the product. One-level hairline case cards are allowed.
+Reject: centered generic hero, badge pills, nested cards-in-cards, icon tiles, gradient text, auto-playing typewriter, marquee, particle libraries, and stock photos of the album. Dark rest is the default product. A masthead sun/moon toggles light rest. One-level hairline case cards are allowed.
 
 ### Stack
 
@@ -207,7 +209,7 @@ Default is stillness. Bloom motion must feel like growth and weather, not UI chr
 
 - Do not implement the official Vercel report shell (`vbg-report`, wordmark, triangle).
 - Do not use the supplied album screenshots as UI backgrounds (copyright, and they flatten the idea into a moodboard). Recreate the *language* of Nurture in CSS/SVG.
-- Do not default to nurture or simple. Hybrid is the default. The masthead cycles hybrid / nurture / simple.
+- Do not default to nurture or hybrid. Simple is the default. The masthead cycles hybrid / nurture / simple.
 - Do not bloom every list item at once.
 - Do not sacrifice scanability for atmosphere. If a bloomed row is harder to read than rest, the bloom failed.
 - Do not overlay `( intern )` style whispers on neighboring rows. Keep tags in the row, next to Read more, visible only in nurture or while the row is highlighted in hybrid.
@@ -229,6 +231,10 @@ Keep this in sync with `src/lib/content.ts`. If they drift, the TypeScript modul
 - Email: jadenseangmany@gmail.com
 - LinkedIn: https://linkedin.com/in/jadenseangmany
 - GitHub: https://github.com/jadenseangmany
+- Home: San Diego, California, born in Texas
+- Favorite food: Melon bread
+- Fun fact: 8 cats, 29 countries
+- Hobbies: Rock climbing, badminton, golfing, travelling, webtoons/manwha/manga, anime/movies, music/concerts/raves, Geometry Dash, cafes
 
 **Education** — UC San Diego. M.S. Machine Learning & Data Science, B.S. Computer Engineering, B.S. Cognitive Science (w/ spec in Machine Learning & Neural Computation). 2023 – 2028.
 
@@ -269,7 +275,7 @@ Keep this in sync with `src/lib/content.ts`. If they drift, the TypeScript modul
 **Projects**
 
 1. AgentUX (April 2026). 1st Place, Wildcard Track @ DiamondHacks 2026, 400+ competitors. GitHub: https://github.com/jadenseangmany/agentux. Live: https://www.agentux.dev/. FastAPI, Browser Use, Gemini, Playwright, WebSocket, Chrome Extension. Agentic UX testing, 10+ parallel personas, 85%+ of known usability issues.
-2. Decidr. Soon on the App Store. GitHub: https://github.com/jadenseangmany/decidr. React Native, Expo, TypeScript, Express, MongoDB, Yelp API. Location-based restaurant picker with rating-count weighted scoring.
+2. Decidr. Soon on the App Store. GitHub: https://github.com/jadenseangmany/decidr. React Native, Expo, TypeScript, Express, MongoDB, Yelp API, Google Maps. Location-based restaurant picker with rating-count weighted scoring.
 3. ACM AI Site. 7,000+ users, 1,000+ new users every year. GitHub: https://github.com/acmucsd/acm-ai-site. Live: https://ai.acmucsd.com. React, TypeScript, Ant Design, React Router, Express, Chart.js.
 4. PromptShield. Published on the Chrome Web Store. GitHub: https://github.com/jadenseangmany/PromptShield. JavaScript, Chrome Extension, Manifest V3. Blocks sensitive data from ChatGPT locally.
 5. Diabeatit Lunchbox. GitHub: https://github.com/jadenseangmany/Diabeatit-Lunchbox-Minigame-SP25. Play: https://play.unity.com/en/games/65a3232a-14d8-4455-867d-29180369e56f/lunch-boxwebgl. Unity, C#, WebGL. Educational lunch-packing game for children 8–13 on Type 2 diabetes prevention, with guidance from Dr. Charles Goldberg at UC San Diego.
@@ -291,6 +297,7 @@ src/app/projects/[slug]/page.tsx
 src/app/listening/page.tsx
 src/app/matcha/page.tsx
 src/app/matcha/[slug]/page.tsx
+src/app/travel/[slug]/page.tsx
 src/app/globals.css       tokens, grain, scribble, bloom keyframes
 src/lib/content.ts        resume facts
 src/lib/matcha.ts         matcha ranking and visit copy
@@ -306,6 +313,11 @@ scripts/spotify-history.py
 src/components/Matcha.tsx
 src/components/MatchaVisit.tsx
 src/components/Fun.tsx
+src/components/Papers.tsx
+src/components/Awards.tsx
+src/components/Countries.tsx
+src/components/TravelNote.tsx
+src/lib/travel.ts
 src/components/bloom/Bloom.tsx
 src/components/bloom/FullBloom.tsx
 src/components/bloom/CanopyBackground.tsx
@@ -313,6 +325,8 @@ src/components/bloom/canopy-scene.ts
 src/components/bloom/BloomCursor.tsx
 src/components/bloom/HeroStreaks.tsx
 src/components/NurtureToggle.tsx
+src/components/ThemeToggle.tsx
+src/components/ModeHint.tsx
 src/components/PillNav.tsx
 src/components/Header.tsx
 src/components/Hero.tsx

@@ -16,7 +16,7 @@ export async function generateMetadata({
   if (!shop) return { title: site.name };
   return {
     title: `${shop.name} · Matcha · ${site.name}`,
-    description: `${shop.name}, ${shop.location}. Rank ${shop.rank} of ${matcha.length}.`,
+    description: `${shop.name}, ${shop.location}. Top ${shop.rank}.`,
   };
 }
 

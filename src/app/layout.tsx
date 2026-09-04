@@ -30,12 +30,20 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://jaden.lol"),
 };
 
+const BOOT_SCRIPT = `(function(){try{var r=document.documentElement;var mode="simple";var raw=localStorage.getItem("jaden.bloom");if(raw){var p=JSON.parse(raw);if(p.mode==="hybrid"||p.mode==="nurture"||p.mode==="simple")mode=p.mode;else if(p.fullBloom===true||p.nurture===true)mode="nurture";}r.dataset.bloomMode=mode;r.classList.toggle("full-bloom",mode==="nurture");r.classList.toggle("bloom-simple",mode==="simple");var theme=localStorage.getItem("jaden.theme");r.dataset.theme=theme==="light"?"light":"dark";r.style.colorScheme=r.dataset.theme;}catch(e){}})();`;
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} ${geistSans.className} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} ${geistSans.className} bloom-simple h-full antialiased`}
+      data-bloom-mode="simple"
+      data-theme="dark"
+      suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: BOOT_SCRIPT }} />
+      </head>
       <body className="min-h-full">
         <BloomProvider>
           <SiteChrome>

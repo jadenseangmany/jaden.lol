@@ -4,7 +4,6 @@ import { join } from "node:path";
 import { BloomUnit } from "@/components/bloom/Bloom";
 import { cn } from "@/lib/cn";
 import { matcha, type MatchaShop } from "@/lib/matcha";
-import { site } from "@/lib/content";
 
 export function resolveCover(shop: MatchaShop) {
   if (shop.image) return shop.image;
@@ -49,7 +48,7 @@ function MatchaCard({ shop }: { shop: MatchaShop }) {
           <p className="case-card-kicker">{shop.location}</p>
           <h2 className="bloom-title">{shop.name}</h2>
           <p className="meta meta-start">
-            Rank {shop.rank} of {matcha.length}
+            Top {shop.rank}
           </p>
         </Link>
       </BloomUnit>
@@ -62,21 +61,9 @@ export function Matcha() {
     <div className="page-main matcha-page">
       <div className="frame">
         <Link href="/#fun" className="back-link">
-          Fun
+          Matcha
         </Link>
-        <BloomUnit
-          id="matcha-hero"
-          variant="meadow"
-          pinOnClick={false}
-          className="case-hero"
-        >
-          <p className="whisper">( matcha )</p>
-          <p className="case-kicker">{site.name}</p>
-          <h1 className="bloom-title">Matcha</h1>
-          <p className="meta meta-start">
-            {matcha.length} shops, ranked. Click a card to open the visit.
-          </p>
-        </BloomUnit>
+        <h1 className="visually-hidden">Matcha</h1>
         <div className="card-grid matcha-grid">
           {matcha.map((shop) => (
             <MatchaCard key={shop.id} shop={shop} />

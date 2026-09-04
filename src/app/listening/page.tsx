@@ -7,7 +7,7 @@ import type { Metadata } from "next";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: `Listening · ${site.name}`,
+  title: `Spotify Stats · ${site.name}`,
   description:
     "All-time Spotify minutes from extended history, plus windows, play counts, and a search through the catalog.",
 };

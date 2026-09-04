@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { BloomUnit } from "@/components/bloom/Bloom";
 import { resolveCover } from "@/components/Matcha";
 import { cn } from "@/lib/cn";
-import { matcha, type MatchaShop } from "@/lib/matcha";
+import { type MatchaShop } from "@/lib/matcha";
 
 function visitPhotos(shop: MatchaShop) {
   const extras = [...shop.photos];
@@ -51,12 +51,12 @@ export function MatchaVisit({ shop }: { shop: MatchaShop }) {
           <p className="case-kicker">{shop.location}</p>
           <h1 className="bloom-title">{shop.name}</h1>
           <p className="meta meta-start">
-            Rank {shop.rank} of {matcha.length}
+            Top {shop.rank}
           </p>
         </BloomUnit>
         <dl className="proof-row">
           <div>
-            <dt>rank</dt>
+            <dt>top</dt>
             <dd className="stat-items">{shop.rank}</dd>
           </div>
           <div>

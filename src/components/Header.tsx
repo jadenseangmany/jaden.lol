@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { ModeHint } from "@/components/ModeHint";
 import { NurtureToggle } from "@/components/NurtureToggle";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { site } from "@/lib/content";
 
 export function Header() {
@@ -15,7 +17,10 @@ export function Header() {
             resume
           </a>
           <a href={`mailto:${site.email}`}>email</a>
-          <NurtureToggle />
+          <ModeHint>
+            <NurtureToggle />
+          </ModeHint>
+          <ThemeToggle />
         </div>
       </div>
     </header>

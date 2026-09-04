@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { BloomUnit, SectionHeading } from "@/components/bloom/Bloom";
-import { ListeningExplorer } from "@/components/ListeningExplorer";
+import { ListeningAsk, ListeningExplorer } from "@/components/ListeningExplorer";
 import { Art, Proof, n } from "@/components/listening-ui";
 import {
   historyWindows,
@@ -39,10 +39,9 @@ export function ListeningSetup() {
     <div className="page-main listening-page">
       <div className="frame">
         <Link href="/#fun" className="back-link">
-          Fun
+          Spotify Stats
         </Link>
-        <p className="case-kicker">( listening )</p>
-        <h1 className="page-title">Listening</h1>
+        <h1 className="visually-hidden">Spotify Stats</h1>
         <p className="case-block">
           This page reads Jaden’s Spotify account. It is waiting on a connection.
         </p>
@@ -56,10 +55,9 @@ export function ListeningError() {
     <div className="page-main listening-page">
       <div className="frame">
         <Link href="/#fun" className="back-link">
-          Fun
+          Spotify Stats
         </Link>
-        <p className="case-kicker">( listening )</p>
-        <h1 className="page-title">Listening</h1>
+        <h1 className="visually-hidden">Spotify Stats</h1>
         <p className="case-block">
           Spotify did not return a snapshot. Try again in a minute.
         </p>
@@ -88,30 +86,13 @@ export function Listening({
     <div className="page-main listening-page">
       <div className="frame">
         <Link href="/#fun" className="back-link">
-          Fun
+          Spotify Stats
         </Link>
-        <BloomUnit
-          id="listening-hero"
-          variant="split"
-          pinOnClick={false}
-          className="case-hero"
-        >
-          <p className="whisper">( listening )</p>
-          <p className="case-kicker">{data?.profile.name ?? "Spotify"}</p>
-          <h1 className="bloom-title">Listening</h1>
-          <p className="meta meta-start">
-            {data
-              ? `${data.profile.product} · ${n(data.profile.followers)} followers`
-              : "extended history"}
-            {data?.nowPlaying
-              ? ` · now ${data.nowPlaying.name}`
-              : data
-                ? " · nothing playing"
-                : ""}
-          </p>
-        </BloomUnit>
-
-        <p className="listening-hero-stat stat-items">{n(heroMinutes)}</p>
+        <h1 className="visually-hidden">Spotify Stats</h1>
+        <div className="listening-lede">
+          <p className="listening-hero-stat stat-items">{n(heroMinutes)}</p>
+          <ListeningAsk />
+        </div>
         <p className="listening-note">
           {lifetime
             ? `Minutes from Spotify extended history, ${monthYear(lifetime.firstPlay)} through ${monthYear(lifetime.lastPlay)}. A play counts after 30 seconds, same as Wrapped.${data ? "" : " The live snapshot is unavailable."}`

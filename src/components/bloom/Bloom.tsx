@@ -34,7 +34,7 @@ export type BloomMode = (typeof BLOOM_MODES)[number];
 
 export function nextBloomMode(mode: BloomMode): BloomMode {
   const index = BLOOM_MODES.indexOf(mode);
-  return BLOOM_MODES[(index + 1) % BLOOM_MODES.length] ?? "hybrid";
+  return BLOOM_MODES[(index + 1) % BLOOM_MODES.length] ?? "simple";
 }
 
 function isBloomMode(value: unknown): value is BloomMode {
@@ -60,7 +60,7 @@ type BloomStore = {
 const DEFAULT_STORE: BloomStore = {
   field: null,
   pinnedId: null,
-  mode: "hybrid",
+  mode: "simple",
   fullBloom: false,
 };
 
@@ -97,7 +97,7 @@ function persistMode(mode: BloomMode) {
 function readStoredMode(): BloomMode {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return "hybrid";
+    if (!raw) return "simple";
     const parsed = JSON.parse(raw) as {
       mode?: unknown;
       fullBloom?: unknown;
@@ -105,9 +105,9 @@ function readStoredMode(): BloomMode {
     };
     if (isBloomMode(parsed.mode)) return parsed.mode;
     if (parsed.fullBloom === true || parsed.nurture === true) return "nurture";
-    return "hybrid";
+    return "simple";
   } catch {
-    return "hybrid";
+    return "simple";
   }
 }
 
@@ -117,7 +117,7 @@ export function BloomProvider({ children }: { children: ReactNode }) {
   const storeRef = useRef<BloomStore>({ ...DEFAULT_STORE });
   const listenersRef = useRef(new Set<() => void>());
   const settingsListenersRef = useRef(new Set<() => void>());
-  const settingsRef = useRef(settingsOf("hybrid"));
+  const settingsRef = useRef(settingsOf("simple"));
   const unitsRef = useRef(new Map<string, HTMLElement>());
 
   const emit = useCallback(() => {

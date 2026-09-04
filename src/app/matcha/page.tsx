@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: `Matcha · ${site.name}`,
-  description: "Ranked matcha shops Jaden has visited.",
+  description: "Top matcha shops Jaden has visited.",
 };
 
 export default function MatchaIndexPage() {
