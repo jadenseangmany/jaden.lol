@@ -15,7 +15,11 @@ export async function GET(request: Request) {
 
   try {
     const covers = await getTrackCovers(ids);
-    return NextResponse.json(covers);
+    return NextResponse.json(covers, {
+      headers: {
+        "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=604800",
+      },
+    });
   } catch {
     return NextResponse.json({});
   }

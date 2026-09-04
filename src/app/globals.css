@@ -2000,8 +2000,7 @@ html.full-bloom .matcha-review {
   padding: var(--space-2) var(--space-5) var(--space-6);
 }
 
-.case-hero .whisper,
-.about-identity .whisper {
+.case-hero .whisper {
   margin-bottom: var(--space-2);
 }
 
@@ -2089,17 +2088,21 @@ html.full-bloom .matcha-review {
   margin-top: 0;
 }
 
+.about-page {
+  --about-photo-size: 168px;
+}
+
 .about-intro {
   display: grid;
-  grid-template-columns: 168px minmax(0, 1fr);
+  grid-template-columns: var(--about-photo-size) minmax(0, 1fr);
   gap: var(--space-6);
   align-items: start;
   margin-bottom: var(--space-8);
 }
 
 .about-photo {
-  width: 168px;
-  height: 168px;
+  width: var(--about-photo-size);
+  height: var(--about-photo-size);
   overflow: hidden;
   border-radius: var(--radius);
 }
@@ -2124,8 +2127,19 @@ html.full-bloom .matcha-review {
 }
 
 .about-identity {
+  position: relative;
   min-width: 0;
-  padding-top: var(--space-3);
+}
+
+.about-identity .whisper {
+  position: absolute;
+  left: 0;
+  bottom: 100%;
+  margin: 0 0 var(--space-2);
+}
+
+.about-copy {
+  min-width: 0;
 }
 
 .about-identity .bloom-title {
@@ -2142,6 +2156,39 @@ html.full-bloom .matcha-review {
   line-height: var(--leading-label-14);
 }
 
+.about-summary {
+  max-width: 68ch;
+  margin: 0 0 var(--space-8);
+}
+
+.about-summary-heading {
+  margin: 0 0 var(--space-3);
+  font-size: var(--type-heading-16);
+  line-height: var(--leading-heading-16);
+  font-weight: var(--weight-heading);
+  letter-spacing: -0.02em;
+}
+
+.about-summary-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--rest-border);
+  border-bottom: 1px solid var(--rest-border);
+}
+
+.about-summary-list li {
+  margin: 0;
+  padding-block: var(--space-3);
+  color: var(--rest-fg-muted);
+  font-size: var(--type-copy-16);
+  line-height: var(--leading-copy-16);
+}
+
+.about-summary-list li + li {
+  border-top: 1px solid var(--rest-border);
+}
+
 .about-bio {
   max-width: 68ch;
   margin: 0 0 var(--space-8);
@@ -2155,42 +2202,6 @@ html.full-bloom .matcha-review {
 
 .about-bio p + p {
   margin-top: var(--space-4);
-}
-
-.about-contact {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-4);
-  color: var(--rest-fg-muted);
-  font-size: var(--type-label-14);
-  line-height: var(--leading-label-14);
-}
-
-.about-facts {
-  margin: 0 0 var(--space-8);
-  border-top: 1px solid var(--rest-border);
-}
-
-.about-fact {
-  display: grid;
-  grid-template-columns: 10rem minmax(0, 1fr);
-  gap: var(--space-4);
-  padding-block: var(--space-4);
-  border-bottom: 1px solid var(--rest-border);
-  align-items: baseline;
-}
-
-.about-fact-label {
-  margin: 0;
-  font-size: var(--type-label-14);
-  line-height: var(--leading-label-14);
-  color: var(--rest-fg-muted);
-}
-
-.about-fact-value {
-  margin: 0;
-  font-size: var(--type-copy-14);
-  line-height: var(--leading-copy-16);
 }
 
 .about-countries {
@@ -2353,6 +2364,12 @@ html.full-bloom .matcha-review {
   border-right: 1px solid currentColor;
   border-bottom: 1px solid currentColor;
   transform: rotate(45deg);
+  transition: transform 320ms var(--ease-bloom), margin-top 320ms var(--ease-bloom);
+}
+
+.show-more[aria-expanded="true"] .show-more-chevron {
+  margin-top: 3px;
+  transform: rotate(-135deg);
 }
 
 .route-cover {
@@ -2943,6 +2960,8 @@ html.full-bloom .horizon-mark.is-current .horizon-tick {
 
 .listening-row:hover .listening-art,
 .listening-row:focus-visible .listening-art,
+.listening-now:hover .listening-art,
+.listening-now:focus-within .listening-art,
 .listening-now[data-bloom] .listening-art,
 html.full-bloom .listening-art {
   filter: grayscale(0) brightness(1);
@@ -3118,7 +3137,6 @@ html.full-bloom .listening-row {
   .about-intro,
   .job-top,
   .skill-row,
-  .about-fact,
   .card-grid,
   .listening-split,
   .listening-lede {
@@ -3129,9 +3147,13 @@ html.full-bloom .listening-row {
     grid-template-columns: 24px 48px minmax(0, 1fr);
   }
 
+  .about-page {
+    --about-photo-size: 140px;
+  }
+
   .about-photo {
-    width: 140px;
-    height: 140px;
+    width: var(--about-photo-size);
+    height: var(--about-photo-size);
   }
 
   .listening-row:not(:has(.listening-art)) {

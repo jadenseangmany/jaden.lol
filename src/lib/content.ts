@@ -251,25 +251,17 @@ export const bio = {
   chat: "I love to chat about anything, so just send me a message in any of my contact information and I will likely respond immediately! And be sure to check out my ",
 } as const;
 
-export const personalFacts: readonly { label: string; value: string }[] = [
-  {
-    label: "Home",
-    value: "San Diego, California but born in Texas",
-  },
-  {
-    label: "Favorite food",
-    value: "Melon bread",
-  },
-  {
-    label: "Fun fact",
-    value: "I have 8 cats in my house and I've been to 28 countries",
-  },
-  {
-    label: "Hobbies",
-    value:
-      "Rock climbing, badminton, golfing, travelling, reading webtoons/manwha/manga & watching anime/movies, music/concerts/raves, geometry dash, cafes!!",
-  },
-];
+export const aiSummary = {
+  heading: "AI Summary",
+  items: [
+    "Pronouns are He/Him",
+    "Grew up in San Diego, California but was born in Texas",
+    "Favorite food is Melon Pan",
+    "Has 8 cats",
+    "Been to 28 countries",
+    "Likes to go rock climbing, play badminton and golf, travel, read webtoons, manwha, manga, watch anime and movies, listen to music, go to concerts and raves, play geometry dash, and study or hangout at cafes",
+  ],
+} as const;
 
 export type Proof = {
   value: string;

@@ -62,7 +62,7 @@ export function FullBloomDirector() {
       const scrollY = window.scrollY;
       const next: WaveItem[] = [];
       root.querySelectorAll<HTMLElement>("[data-bloom-char]").forEach((el) => {
-        if (el.closest(".nurture-toggle, .mode-toggle, .bloom-settings, .skill-items, .stat-items, .case-row-more, .case-row-aside, .case-row-tags, .whisper, .award-row, .award-list, .about-facts, .about-countries, .country-links, .listening-hours, .listening-ask, .horizon")) return;
+        if (el.closest(".nurture-toggle, .mode-toggle, .bloom-settings, .skill-items, .stat-items, .case-row-more, .case-row-aside, .case-row-tags, .whisper, .award-row, .award-list, .about-summary, .about-countries, .country-links, .listening-hours, .listening-ask, .horizon")) return;
         next.push({
           el,
           y: el.getBoundingClientRect().top + scrollY,

@@ -415,8 +415,15 @@ function buildRange(
 
 let appTokenCache: { access: string; exp: number } | null = null;
 
+function clientEnv() {
+  const id = process.env.SPOTIFY_CLIENT_ID;
+  const secret = process.env.SPOTIFY_CLIENT_SECRET;
+  if (!id || !secret) return null;
+  return { id, secret };
+}
+
 async function clientCredentialsToken() {
-  const env = requiredEnv();
+  const env = clientEnv();
   if (!env) return null;
   if (appTokenCache && appTokenCache.exp > Date.now() + 15_000) return appTokenCache.access;
 

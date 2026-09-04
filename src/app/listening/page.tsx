@@ -1,7 +1,7 @@
 import { Listening, ListeningError, ListeningSetup } from "@/components/Listening";
 import { site } from "@/lib/content";
-import { getLifetimeHistory } from "@/lib/listening-history";
-import { getListeningSnapshot, spotifyConfigured } from "@/lib/spotify";
+import { getLifetimeHistory, windowTrackIds } from "@/lib/listening-history";
+import { getListeningSnapshot, getTrackCovers, spotifyConfigured } from "@/lib/spotify";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -40,9 +40,18 @@ export default async function ListeningPage() {
     );
   }
 
+  let covers: Record<string, string> = {};
+  if (lifetime) {
+    try {
+      covers = await getTrackCovers(windowTrackIds(lifetime));
+    } catch {
+      covers = {};
+    }
+  }
+
   return (
     <main id="main">
-      <Listening data={data} lifetime={lifetime} covers={{}} />
+      <Listening data={data} lifetime={lifetime} covers={covers} />
     </main>
   );
 }

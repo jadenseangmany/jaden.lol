@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useMemo, useState, type KeyboardEvent } from "react";
 import { CountList, Proof, n } from "@/components/listening-ui";
 import { cn } from "@/lib/cn";
 import {
@@ -44,16 +44,38 @@ function rankQuery(query: string, rows: CatalogRow[]) {
   return scored.slice(0, 8).map((item) => item.row);
 }
 
+function useSpotifyCovers(ids: readonly string[], preset: Record<string, string> = {}) {
+  const [extra, setExtra] = useState<Record<string, string>>({});
+  const needed = ids
+    .filter((id) => /^[A-Za-z0-9]{22}$/.test(id) && !preset[id] && !extra[id])
+    .join(",");
+
+  useEffect(() => {
+    if (!needed) return;
+    const ctrl = new AbortController();
+    fetch(`/api/spotify/covers?ids=${needed}`, { signal: ctrl.signal })
+      .then((res) => (res.ok ? res.json() : {}))
+      .then((next: Record<string, string>) => {
+        if (ctrl.signal.aborted) return;
+        setExtra((prev) => ({ ...prev, ...next }));
+      })
+      .catch(() => {});
+    return () => ctrl.abort();
+  }, [needed]);
+
+  return { ...preset, ...extra };
+}
+
 export function ListeningAsk() {
   const [query, setQuery] = useState("");
   const [catalog, setCatalog] = useState<CatalogRow[] | null>(null);
-  const [liveCovers, setLiveCovers] = useState<Record<string, string>>({});
-  const fetchedIds = useRef(new Set<string>());
 
   const matches = useMemo(() => {
     if (!catalog) return [];
     return rankQuery(query, catalog);
   }, [catalog, query]);
+
+  const coverMap = useSpotifyCovers(matches.map((row) => row[0]));
 
   useEffect(() => {
     if (query.trim().length < 2 || catalog) return;
@@ -71,33 +93,6 @@ export function ListeningAsk() {
     };
   }, [catalog, query]);
 
-  useEffect(() => {
-    const ids = matches
-      .map((row) => row[0])
-      .filter((id) => {
-        if (!/^[A-Za-z0-9]{22}$/.test(id)) return false;
-        if (liveCovers[id] || fetchedIds.current.has(id)) return false;
-        return true;
-      });
-    if (!ids.length) return;
-    ids.forEach((id) => fetchedIds.current.add(id));
-    const ctrl = new AbortController();
-    const timer = globalThis.setTimeout(() => {
-      fetch(`/api/spotify/covers?ids=${ids.join(",")}`, { signal: ctrl.signal })
-        .then((res) => (res.ok ? res.json() : {}))
-        .then((next: Record<string, string>) => {
-          setLiveCovers((prev) => ({ ...prev, ...next }));
-        })
-        .catch(() => {
-          ids.forEach((id) => fetchedIds.current.delete(id));
-        });
-    }, 80);
-    return () => {
-      ctrl.abort();
-      globalThis.clearTimeout(timer);
-    };
-  }, [liveCovers, matches]);
-
   const searchRows: CountRow[] = matches.map((row) => ({
     id: row[0],
     name: row[1],
@@ -105,7 +100,7 @@ export function ListeningAsk() {
     plays: row[3],
     minutes: 0,
     url: trackUrl(row[0]),
-    image: liveCovers[row[0]] ?? null,
+    image: coverMap[row[0]] ?? null,
   }));
 
   return (
@@ -162,49 +157,21 @@ export function ListeningExplorer({
   covers: Record<string, string>;
 }) {
   const [selected, setSelected] = useState<WindowId>("year");
-  const [liveCovers, setLiveCovers] = useState<Record<string, string>>({});
-  const fetchedIds = useRef(new Set<string>());
-
   const current =
     windows.find((item) => item.id === selected) ??
     windows.find((item) => item.id === "all") ??
     windows[0];
-
-  useEffect(() => {
-    if (!current) return;
-    const ids = current.tracks
-      .map((row) => row.id)
-      .filter((id) => {
-        if (!/^[A-Za-z0-9]{22}$/.test(id)) return false;
-        if (covers[id] || liveCovers[id] || fetchedIds.current.has(id)) return false;
-        return true;
-      });
-    if (!ids.length) return;
-    ids.forEach((id) => fetchedIds.current.add(id));
-    const ctrl = new AbortController();
-    const timer = globalThis.setTimeout(() => {
-      fetch(`/api/spotify/covers?ids=${ids.join(",")}`, { signal: ctrl.signal })
-        .then((res) => (res.ok ? res.json() : {}))
-        .then((next: Record<string, string>) => {
-          setLiveCovers((prev) => ({ ...prev, ...next }));
-        })
-        .catch(() => {
-          ids.forEach((id) => fetchedIds.current.delete(id));
-        });
-    }, 80);
-    return () => {
-      ctrl.abort();
-      globalThis.clearTimeout(timer);
-    };
-  }, [covers, current, liveCovers]);
+  const coverMap = useSpotifyCovers(
+    current?.tracks.map((row) => row.id) ?? [],
+    covers,
+  );
 
   if (!current) return null;
 
-  const mergedCovers = { ...covers, ...liveCovers };
   const painted = {
     ...current,
-    tracks: paintCovers(current.tracks, mergedCovers),
-    artists: paintCovers(current.artists, mergedCovers),
+    tracks: paintCovers(current.tracks, coverMap),
+    artists: paintCovers(current.artists, coverMap),
   };
 
   function onHorizonKey(event: KeyboardEvent<HTMLDivElement>) {

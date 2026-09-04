@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { BloomUnit, SectionHeading } from "@/components/bloom/Bloom";
 import { Countries } from "@/components/Countries";
-import { bio, education, personalFacts, site, skills } from "@/lib/content";
+import { aiSummary, bio, education, site, skills } from "@/lib/content";
 
 export function About() {
   return (
@@ -19,12 +19,24 @@ export function About() {
               />
             }
           </BloomUnit>
-          <BloomUnit id="about-name" variant="split" className="about-identity">
-            <p className="whisper">( about )</p>
-            <h1 className="bloom-title">{site.name}</h1>
-            <p className="about-pronouns">{site.pronouns}</p>
-          </BloomUnit>
+          <div className="about-copy">
+            <BloomUnit id="about-name" variant="split" className="about-identity">
+              <p className="whisper">( about )</p>
+              <h1 className="bloom-title">{site.name}</h1>
+              <p className="about-pronouns">{site.pronouns}</p>
+            </BloomUnit>
+          </div>
         </div>
+        <section className="about-summary" aria-labelledby="about-ai-summary">
+          <h2 id="about-ai-summary" className="about-summary-heading">
+            {aiSummary.heading}
+          </h2>
+          <ul className="about-summary-list">
+            {aiSummary.items.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </section>
         <div className="about-bio">
           <p>{bio.intro}</p>
           <p>
@@ -32,28 +44,6 @@ export function About() {
             <Link href="/matcha">matcha rankings</Link>
             !!!
           </p>
-          <p className="about-contact">
-            <a href={`mailto:${site.email}`}>{site.email}</a>
-            <a href={site.linkedin} target="_blank" rel="noreferrer">
-              LinkedIn
-            </a>
-            <a href={site.github} target="_blank" rel="noreferrer">
-              GitHub
-            </a>
-            <a href={site.phoneHref}>{site.phone}</a>
-          </p>
-        </div>
-        <div className="about-facts">
-          {personalFacts.map((fact) => (
-            <div className="about-fact" key={fact.label}>
-              <p className="about-fact-label">{fact.label}</p>
-              <p className="about-fact-value">
-                {fact.label === "Fun fact"
-                  ? `${fact.value} (see country list below)`
-                  : fact.value}
-              </p>
-            </div>
-          ))}
         </div>
         <Countries />
         <SectionHeading id="heading-education">Education</SectionHeading>

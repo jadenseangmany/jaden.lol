@@ -89,10 +89,11 @@ export function historyWindows(history: LifetimeHistory): HistoryWindow[] {
 
 export function windowTrackIds(history: LifetimeHistory) {
   const ids = new Set<string>();
+  for (const track of history.tracks) ids.add(track.id);
   for (const window of historyWindows(history)) {
     for (const track of window.tracks) ids.add(track.id);
   }
-  return [...ids];
+  return [...ids].filter((id) => /^[A-Za-z0-9]{22}$/.test(id));
 }
 
 export function paintCovers(

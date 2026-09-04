@@ -1,17 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { CaseCard } from "@/components/CaseCard";
 import { nonprofitWork } from "@/lib/content";
 
 export function WorkMore() {
   const [open, setOpen] = useState(false);
-  const firstRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    firstRef.current?.querySelector("a")?.focus();
-  }, [open]);
 
   return (
     <>
@@ -21,7 +15,7 @@ export function WorkMore() {
         aria-hidden={!open}
         inert={!open}
       >
-        <div className="work-more-panel-inner" ref={firstRef}>
+        <div className="work-more-panel-inner">
           {nonprofitWork.map((job) => (
             <CaseCard
               key={job.id}
@@ -35,20 +29,18 @@ export function WorkMore() {
           ))}
         </div>
       </div>
-      {open ? null : (
-        <div className="show-more-wrap">
-          <button
-            type="button"
-            className="show-more"
-            aria-expanded={false}
-            aria-controls="nonprofit-work"
-            onClick={() => setOpen(true)}
-          >
-            <span className="show-more-label">Show more</span>
-            <span className="show-more-chevron" aria-hidden="true" />
-          </button>
-        </div>
-      )}
+      <div className="show-more-wrap">
+        <button
+          type="button"
+          className="show-more"
+          aria-expanded={open}
+          aria-controls="nonprofit-work"
+          onClick={() => setOpen((current) => !current)}
+        >
+          <span className="show-more-label">{open ? "Show less" : "Show more"}</span>
+          <span className="show-more-chevron" aria-hidden="true" />
+        </button>
+      </div>
     </>
   );
 }

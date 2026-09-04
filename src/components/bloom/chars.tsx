@@ -92,7 +92,7 @@ export function wrapBloomChars(node: ReactNode): ReactNode {
         : Array.isArray(props.className)
           ? props.className.filter(Boolean).join(" ")
           : "";
-    if (/\b(skill-items|stat-items|case-row-more|whisper|case-row-aside|case-row-tags|about-facts|about-countries|country-links)\b/.test(className)) return child;
+    if (/\b(skill-items|stat-items|case-row-more|whisper|case-row-aside|case-row-tags|about-summary|about-countries|country-links)\b/.test(className)) return child;
     if (props.children == null) return child;
     return cloneElement(child as ReactElement<{ children?: ReactNode }>, {
       children: wrapBloomChars(props.children),
@@ -173,7 +173,7 @@ export function wrapLooseText(root: ParentNode) {
       if (SKIP_WRAP.has(parent.tagName)) return NodeFilter.FILTER_REJECT;
       if (
         parent.closest(
-          "[data-bloom-char], .nurture-toggle, .mode-toggle, .mode-hint, .theme-toggle, .bloom-settings, .pill-sizer, .skip-link, .route-cover, .skill-items, .stat-items, .case-row-more, .case-row-aside, .case-row-tags, .whisper, .award-row, .award-list, .about-facts, .about-countries, .country-links, .listening-hours, .listening-ask, .horizon, .about-photo, svg",
+          "[data-bloom-char], .nurture-toggle, .mode-toggle, .mode-hint, .theme-toggle, .bloom-settings, .pill-sizer, .skip-link, .route-cover, .skill-items, .stat-items, .case-row-more, .case-row-aside, .case-row-tags, .whisper, .award-row, .award-list, .about-summary, .about-countries, .country-links, .listening-hours, .listening-ask, .horizon, .about-photo, svg",
         )
       ) {
         return NodeFilter.FILTER_REJECT;
