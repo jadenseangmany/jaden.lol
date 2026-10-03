@@ -92,6 +92,17 @@ export type RangeStats = {
   artists: RankedArtist[];
 };
 
+export type NowPlayingTrack = {
+  id: string;
+  name: string;
+  artists: string;
+  paused: boolean;
+  progressMs: number;
+  durationMs: number;
+  url: string | null;
+  image: string | null;
+};
+
 export type ListeningSnapshot = {
   profile: {
     name: string;
@@ -99,16 +110,7 @@ export type ListeningSnapshot = {
     product: string;
     url: string | null;
   };
-  nowPlaying: {
-    name: string;
-    artists: string;
-    paused: boolean;
-    progressMin: number;
-    durationMin: number;
-    progressPct: number;
-    url: string | null;
-    image: string | null;
-  } | null;
+  nowPlaying: NowPlayingTrack | null;
   library: {
     savedTracks: number;
     savedAlbums: number;
@@ -237,10 +239,6 @@ function artistLine(artists: { name: string }[]) {
   return artists.map((a) => a.name).join(", ");
 }
 
-function roundMin(ms: number) {
-  return Math.round(ms / 60000);
-}
-
 function rangeMeta(key: "short" | "medium" | "long"): Pick<RangeStats, "label" | "window"> {
   if (key === "short") return { label: "4 weeks", window: "short_term" };
   if (key === "medium") return { label: "6 months", window: "medium_term" };
@@ -367,7 +365,7 @@ function emptyRange(key: "short" | "medium" | "long"): RangeStats {
   };
 }
 
-export async function getListeningSnapshot(): Promise<ListeningSnapshot | null> {
+export async function getNowPlaying(): Promise<NowPlayingTrack | null> {
   if (!spotifyConfigured()) return null;
   const token = await accessToken();
   if (!token) return null;
@@ -377,21 +375,24 @@ export async function getListeningSnapshot(): Promise<ListeningSnapshot | null> 
     {},
   );
   const nowItem = "item" in now && now.item && now.item.id ? now.item : null;
+  if (!nowItem) return null;
   const progress = "progress_ms" in now ? (now.progress_ms ?? 0) : 0;
-  const nowPlaying = nowItem
-    ? {
-        name: nowItem.name,
-        artists: artistLine(nowItem.artists ?? []),
-        paused: !("is_playing" in now && now.is_playing),
-        progressMin: roundMin(progress),
-        durationMin: roundMin(nowItem.duration_ms || 0),
-        progressPct: nowItem.duration_ms
-          ? Math.round((progress / nowItem.duration_ms) * 100)
-          : 0,
-        url: nowItem.external_urls?.spotify ?? null,
-        image: cover(nowItem.album?.images),
-      }
-    : null;
+  return {
+    id: nowItem.id,
+    name: nowItem.name,
+    artists: artistLine(nowItem.artists ?? []),
+    paused: !("is_playing" in now && now.is_playing),
+    progressMs: progress,
+    durationMs: nowItem.duration_ms || 0,
+    url: nowItem.external_urls?.spotify ?? null,
+    image: cover(nowItem.album?.images),
+  };
+}
+
+export async function getListeningSnapshot(): Promise<ListeningSnapshot | null> {
+  if (!spotifyConfigured()) return null;
+  const token = await accessToken();
+  if (!token) return null;
 
   return {
     profile: {
@@ -400,7 +401,7 @@ export async function getListeningSnapshot(): Promise<ListeningSnapshot | null> 
       product: "unknown",
       url: null,
     },
-    nowPlaying,
+    nowPlaying: await getNowPlaying(),
     library: {
       savedTracks: 0,
       savedAlbums: 0,

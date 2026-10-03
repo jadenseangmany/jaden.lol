@@ -2879,6 +2879,23 @@ html.full-bloom .horizon-mark.is-current .horizon-tick {
   height: 56px;
 }
 
+.listening-now-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.listening-now-bar {
+  margin-top: var(--space-3);
+  height: 1px;
+  background: var(--rest-border);
+}
+
+.listening-now-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--rest-fg);
+}
+
 .listening-split {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

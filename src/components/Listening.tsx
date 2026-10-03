@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { BloomUnit, SectionHeading } from "@/components/bloom/Bloom";
+import { SectionHeading } from "@/components/bloom/Bloom";
 import { ListeningAsk, ListeningExplorer } from "@/components/ListeningExplorer";
-import { Art, Proof, n } from "@/components/listening-ui";
+import { ListeningNow } from "@/components/ListeningNow";
+import { Proof, n } from "@/components/listening-ui";
 import {
   historyWindows,
   monthYear,
@@ -99,27 +100,7 @@ export function Listening({
             : "Minutes across the last 50 plays. Spotify’s public API does not publish lifetime totals."}
         </p>
 
-        {data?.nowPlaying ? (
-          <BloomUnit
-            id="listening-now"
-            variant="meadow"
-            pinOnClick={false}
-            className="listening-now"
-          >
-            <Art src={data.nowPlaying.image} />
-            <div>
-              <p className="case-kicker">
-                {data.nowPlaying.paused ? "Paused" : "Now"}
-              </p>
-              <p className="bloom-title">{data.nowPlaying.name}</p>
-              <p className="meta meta-start">{data.nowPlaying.artists}</p>
-              <p className="meta meta-start stat-items">
-                {data.nowPlaying.progressMin} / {data.nowPlaying.durationMin} min
-                · {data.nowPlaying.progressPct}%
-              </p>
-            </div>
-          </BloomUnit>
-        ) : null}
+        {data ? <ListeningNow initial={data.nowPlaying} enabled /> : null}
 
         {lifetime ? (
           <>
