@@ -108,7 +108,9 @@ export function Listening({
           >
             <Art src={data.nowPlaying.image} />
             <div>
-              <p className="case-kicker">Now</p>
+              <p className="case-kicker">
+                {data.nowPlaying.paused ? "Paused" : "Now"}
+              </p>
               <p className="bloom-title">{data.nowPlaying.name}</p>
               <p className="meta meta-start">{data.nowPlaying.artists}</p>
               <p className="meta meta-start stat-items">

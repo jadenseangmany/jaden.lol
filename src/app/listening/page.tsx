@@ -3,6 +3,7 @@ import { site } from "@/lib/content";
 import { getLifetimeHistory, windowTrackIds } from "@/lib/listening-history";
 import { getListeningSnapshot, getTrackCovers, spotifyConfigured } from "@/lib/spotify";
 import type { Metadata } from "next";
+import { connection } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -13,14 +14,15 @@ export const metadata: Metadata = {
 };
 
 export default async function ListeningPage() {
+  await connection();
   const lifetime = getLifetimeHistory();
   let data = null;
 
   if (spotifyConfigured()) {
     try {
       data = await getListeningSnapshot();
-    } catch {
-      /* history still renders */
+    } catch (error) {
+      console.error("Listening snapshot failed", error);
     }
   }
 

@@ -12,7 +12,6 @@
 
 const TOKEN_URL = "https://accounts.spotify.com/api/token";
 const API = "https://api.spotify.com/v1";
-const TZ = "America/Los_Angeles";
 
 type Paging<T> = {
   items: T[];
@@ -21,16 +20,6 @@ type Paging<T> = {
 };
 
 type SpotifyImage = { url: string; height: number | null; width: number | null };
-
-type SpotifyArtist = {
-  id: string;
-  name: string;
-  genres?: string[];
-  popularity?: number;
-  followers?: { total: number };
-  external_urls?: { spotify?: string };
-  images?: SpotifyImage[];
-};
 
 type SpotifyTrack = {
   id: string;
@@ -45,11 +34,6 @@ type SpotifyTrack = {
     release_date?: string;
     images?: SpotifyImage[];
   };
-};
-
-type RecentlyPlayed = {
-  played_at: string;
-  track: SpotifyTrack;
 };
 
 type NowPlaying = {
@@ -118,6 +102,7 @@ export type ListeningSnapshot = {
   nowPlaying: {
     name: string;
     artists: string;
+    paused: boolean;
     progressMin: number;
     durationMin: number;
     progressPct: number;
@@ -156,10 +141,15 @@ export type ListeningSnapshot = {
 
 let tokenCache: { access: string; exp: number } | null = null;
 
+function envValue(key: string) {
+  const value = process.env[key]?.trim().replace(/^['"]|['"]$/g, "");
+  return value || null;
+}
+
 function requiredEnv() {
-  const id = process.env.SPOTIFY_CLIENT_ID;
-  const secret = process.env.SPOTIFY_CLIENT_SECRET;
-  const refresh = process.env.SPOTIFY_REFRESH_TOKEN;
+  const id = envValue("SPOTIFY_CLIENT_ID");
+  const secret = envValue("SPOTIFY_CLIENT_SECRET");
+  const refresh = envValue("SPOTIFY_REFRESH_TOKEN");
   if (!id || !secret || !refresh) return null;
   return { id, secret, refresh };
 }
@@ -173,44 +163,62 @@ async function accessToken() {
   if (!env) return null;
   if (tokenCache && tokenCache.exp > Date.now() + 15_000) return tokenCache.access;
 
-  const body = new URLSearchParams({
-    grant_type: "refresh_token",
-    refresh_token: env.refresh,
-  });
-  const res = await fetch(TOKEN_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Basic ${Buffer.from(`${env.id}:${env.secret}`).toString("base64")}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body,
-    cache: "no-store",
-  });
-  if (!res.ok) {
-    throw new Error(`Spotify token ${res.status}`);
+  try {
+    const res = await fetch(TOKEN_URL, {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${env.id}:${env.secret}`).toString("base64")}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        grant_type: "refresh_token",
+        refresh_token: env.refresh,
+      }),
+      cache: "no-store",
+      signal: AbortSignal.timeout(6000),
+    });
+    if (!res.ok) {
+      const detail = (await res.text()).slice(0, 180);
+      console.error(`Spotify token ${res.status} ${detail}`);
+      return null;
+    }
+    const json = (await res.json()) as { access_token: string; expires_in: number };
+    tokenCache = {
+      access: json.access_token,
+      exp: Date.now() + json.expires_in * 1000,
+    };
+    return json.access_token;
+  } catch (error) {
+    console.error(
+      "Spotify token request failed",
+      error instanceof Error ? error.message : error,
+    );
+    return null;
   }
-  const json = (await res.json()) as { access_token: string; expires_in: number };
-  tokenCache = {
-    access: json.access_token,
-    exp: Date.now() + json.expires_in * 1000,
-  };
-  return json.access_token;
 }
 
-async function spotify<T>(
-  path: string,
-  fallback: T,
-  cache: "revalidate" | "fresh" = "revalidate",
-): Promise<T> {
+async function spotify<T>(path: string, fallback: T): Promise<T> {
   const token = await accessToken();
   if (!token) return fallback;
-  const res = await fetch(`${API}${path}`, {
-    headers: { Authorization: `Bearer ${token}` },
-    ...(cache === "fresh" ? { cache: "no-store" as const } : { next: { revalidate: 60 } }),
-  });
-  if (res.status === 204) return fallback;
-  if (!res.ok) return fallback;
-  return (await res.json()) as T;
+  try {
+    const res = await fetch(`${API}${path}`, {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: "no-store",
+      signal: AbortSignal.timeout(6000),
+    });
+    if (res.status === 204) return fallback;
+    if (!res.ok) {
+      console.error(`Spotify ${path} ${res.status}`);
+      return fallback;
+    }
+    return (await res.json()) as T;
+  } catch (error) {
+    console.error(
+      `Spotify ${path} failed`,
+      error instanceof Error ? error.message : error,
+    );
+    return fallback;
+  }
 }
 
 function cover(images?: SpotifyImage[]) {
@@ -229,122 +237,8 @@ function artistLine(artists: { name: string }[]) {
   return artists.map((a) => a.name).join(", ");
 }
 
-function yearOf(date?: string) {
-  if (!date) return null;
-  const year = Number(date.slice(0, 4));
-  return Number.isFinite(year) ? year : null;
-}
-
 function roundMin(ms: number) {
   return Math.round(ms / 60000);
-}
-
-function artistUrl(id: string, url?: string) {
-  return url ?? `https://open.spotify.com/artist/${id}`;
-}
-
-function buildRecent(plays: RecentlyPlayed[]) {
-  const hours = Array.from({ length: 24 }, () => 0);
-  const tracks = new Map<string, CountRow & { ms: number }>();
-  const artists = new Map<string, CountRow & { ms: number }>();
-  let ms = 0;
-  let longestMs = 0;
-  const times: number[] = [];
-
-  for (const play of plays) {
-    const track = play.track;
-    if (!track?.id) continue;
-    const duration = track.duration_ms || 0;
-    ms += duration;
-    longestMs = Math.max(longestMs, duration);
-    times.push(new Date(play.played_at).getTime());
-    hours[hourInTz(play.played_at)] += duration;
-
-    const current = tracks.get(track.id);
-    if (current) {
-      current.plays += 1;
-      current.ms += duration;
-    } else {
-      tracks.set(track.id, {
-        id: track.id,
-        name: track.name,
-        artists: artistLine(track.artists),
-        plays: 1,
-        minutes: 0,
-        ms: duration,
-        url: track.external_urls?.spotify ?? null,
-        image: cover(track.album?.images),
-      });
-    }
-
-    const share = duration / Math.max(track.artists.length, 1);
-    for (const artist of track.artists) {
-      if (!artist.id) continue;
-      const row = artists.get(artist.id);
-      if (row) {
-        row.plays += 1;
-        row.ms += share;
-      } else {
-        artists.set(artist.id, {
-          id: artist.id,
-          name: artist.name,
-          artists: artist.name,
-          plays: 1,
-          minutes: 0,
-          ms: share,
-          url: artistUrl(artist.id),
-          image: null,
-        });
-      }
-    }
-  }
-
-  const spanMs = times.length >= 2 ? Math.max(...times) - Math.min(...times) : null;
-  const peakHour = hours.reduce((best, value, hour) => {
-    const current = hours[best] ?? 0;
-    return value > current ? hour : best;
-  }, 0);
-  const finalize = (row: CountRow & { ms: number }): CountRow => ({
-    id: row.id,
-    name: row.name,
-    artists: row.artists,
-    plays: row.plays,
-    minutes: roundMin(row.ms),
-    url: row.url,
-    image: row.image,
-  });
-
-  return {
-    plays: plays.length,
-    uniqueTracks: tracks.size,
-    uniqueArtists: artists.size,
-    repeats: Math.max(0, plays.length - tracks.size),
-    repeatPct: plays.length ? Math.round(((plays.length - tracks.size) / plays.length) * 100) : 0,
-    minutes: roundMin(ms),
-    meanPlayMin: plays.length ? Math.round(ms / plays.length / 6000) / 10 : 0,
-    longestMin: roundMin(longestMs),
-    spanHours: spanMs != null ? Math.round((spanMs / 3600000) * 10) / 10 : null,
-    peakHour,
-    hours: hours.map((value) => roundMin(value)),
-    tracks: [...tracks.values()]
-      .sort((a, b) => b.plays - a.plays || b.ms - a.ms)
-      .slice(0, 15)
-      .map(finalize),
-    artists: [...artists.values()]
-      .sort((a, b) => b.ms - a.ms || b.plays - a.plays)
-      .slice(0, 15)
-      .map(finalize),
-  };
-}
-
-function hourInTz(iso: string) {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: TZ,
-    hour: "numeric",
-    hourCycle: "h23",
-  }).formatToParts(new Date(iso));
-  const hour = Number(parts.find((part) => part.type === "hour")?.value);
-  return Number.isFinite(hour) ? hour % 24 : 0;
 }
 
 function rangeMeta(key: "short" | "medium" | "long"): Pick<RangeStats, "label" | "window"> {
@@ -353,71 +247,11 @@ function rangeMeta(key: "short" | "medium" | "long"): Pick<RangeStats, "label" |
   return { label: "about a year", window: "long_term" };
 }
 
-function buildRange(
-  key: "short" | "medium" | "long",
-  tracks: SpotifyTrack[],
-  artists: SpotifyArtist[],
-): RangeStats {
-  const liveTracks = tracks.filter((t) => t?.id);
-  const liveArtists = artists.filter((a) => a?.id);
-  const catalogMs = liveTracks.reduce((sum, t) => sum + (t.duration_ms || 0), 0);
-  const pops = liveTracks.map((t) => t.popularity ?? 0);
-  const explicit = liveTracks.filter((t) => t.explicit).length;
-  const artistIds = new Set(liveTracks.flatMap((t) => t.artists.map((a) => a.id)));
-  const albums = new Set(
-    liveTracks.map((t) => t.album?.name).filter((name): name is string => Boolean(name)),
-  );
-  const genres = new Set(liveArtists.flatMap((a) => a.genres ?? []));
-  const years = liveTracks.map((t) => yearOf(t.album?.release_date)).filter((y): y is number => y != null);
-  const minutesByArtist = new Map<string, number>();
-  for (const t of liveTracks) {
-    const share = (t.duration_ms || 0) / Math.max(t.artists.length, 1);
-    for (const a of t.artists) {
-      minutesByArtist.set(a.id, (minutesByArtist.get(a.id) ?? 0) + share);
-    }
-  }
-
-  return {
-    ...rangeMeta(key),
-    catalogMinutes: roundMin(catalogMs),
-    avgPopularity: pops.length ? Math.round(pops.reduce((a, b) => a + b, 0) / pops.length) : 0,
-    explicitPct: liveTracks.length ? Math.round((explicit / liveTracks.length) * 100) : 0,
-    uniqueArtists: artistIds.size,
-    uniqueAlbums: albums.size,
-    uniqueGenres: genres.size,
-    oldestYear: years.length ? Math.min(...years) : null,
-    newestYear: years.length ? Math.max(...years) : null,
-    meanDurationMin: liveTracks.length ? Math.round(catalogMs / liveTracks.length / 6000) / 10 : 0,
-    tracks: liveTracks.slice(0, 15).map((t, i) => ({
-      rank: i + 1,
-      id: t.id,
-      name: t.name,
-      artists: artistLine(t.artists),
-      minutes: roundMin(t.duration_ms || 0),
-      popularity: t.popularity ?? 0,
-      year: yearOf(t.album?.release_date),
-      url: t.external_urls?.spotify ?? null,
-      image: cover(t.album?.images),
-    })),
-    artists: liveArtists.slice(0, 15).map((a, i) => ({
-      rank: i + 1,
-      id: a.id,
-      name: a.name,
-      followers: a.followers?.total ?? 0,
-      popularity: a.popularity ?? 0,
-      genres: (a.genres ?? []).slice(0, 3).join(", "),
-      url: artistUrl(a.id, a.external_urls?.spotify),
-      image: cover(a.images),
-      catalogMinutes: roundMin(minutesByArtist.get(a.id) ?? 0),
-    })),
-  };
-}
-
 let appTokenCache: { access: string; exp: number } | null = null;
 
 function clientEnv() {
-  const id = process.env.SPOTIFY_CLIENT_ID;
-  const secret = process.env.SPOTIFY_CLIENT_SECRET;
+  const id = envValue("SPOTIFY_CLIENT_ID");
+  const secret = envValue("SPOTIFY_CLIENT_SECRET");
   if (!id || !secret) return null;
   return { id, secret };
 }
@@ -498,84 +332,88 @@ export async function getTrackCovers(
   return out;
 }
 
+function emptyRecent(): ListeningSnapshot["recent"] {
+  return {
+    plays: 0,
+    uniqueTracks: 0,
+    uniqueArtists: 0,
+    repeats: 0,
+    repeatPct: 0,
+    minutes: 0,
+    meanPlayMin: 0,
+    longestMin: 0,
+    spanHours: null,
+    peakHour: 0,
+    hours: Array.from({ length: 24 }, () => 0),
+    tracks: [],
+    artists: [],
+  };
+}
+
+function emptyRange(key: "short" | "medium" | "long"): RangeStats {
+  return {
+    ...rangeMeta(key),
+    catalogMinutes: 0,
+    avgPopularity: 0,
+    explicitPct: 0,
+    uniqueArtists: 0,
+    uniqueAlbums: 0,
+    uniqueGenres: 0,
+    oldestYear: null,
+    newestYear: null,
+    meanDurationMin: 0,
+    tracks: [],
+    artists: [],
+  };
+}
+
 export async function getListeningSnapshot(): Promise<ListeningSnapshot | null> {
   if (!spotifyConfigured()) return null;
+  const token = await accessToken();
+  if (!token) return null;
 
-  const [
-    me,
-    now,
-    recent,
-    savedTracks,
-    savedAlbums,
-    playlists,
-    following,
-    shows,
-    shortTracks,
-    mediumTracks,
-    longTracks,
-    shortArtists,
-    mediumArtists,
-    longArtists,
-  ] = await Promise.all([
-    spotify<{ display_name?: string; followers?: { total: number }; product?: string; external_urls?: { spotify?: string } }>("/me", {}),
-    spotify<NowPlaying | Record<string, never>>("/me/player/currently-playing", {}, "fresh"),
-    spotify<Paging<RecentlyPlayed>>("/me/player/recently-played?limit=50", { items: [] }),
-    spotify<Paging<unknown>>("/me/tracks?limit=1", { items: [], total: 0 }),
-    spotify<Paging<unknown>>("/me/albums?limit=1", { items: [], total: 0 }),
-    spotify<Paging<unknown>>("/me/playlists?limit=1", { items: [], total: 0 }),
-    spotify<{ artists?: { total?: number } }>("/me/following?type=artist&limit=1", {}),
-    spotify<Paging<unknown>>("/me/shows?limit=1", { items: [], total: 0 }),
-    spotify<Paging<SpotifyTrack>>("/me/top/tracks?time_range=short_term&limit=50", { items: [] }),
-    spotify<Paging<SpotifyTrack>>("/me/top/tracks?time_range=medium_term&limit=50", { items: [] }),
-    spotify<Paging<SpotifyTrack>>("/me/top/tracks?time_range=long_term&limit=50", { items: [] }),
-    spotify<Paging<SpotifyArtist>>("/me/top/artists?time_range=short_term&limit=50", { items: [] }),
-    spotify<Paging<SpotifyArtist>>("/me/top/artists?time_range=medium_term&limit=50", { items: [] }),
-    spotify<Paging<SpotifyArtist>>("/me/top/artists?time_range=long_term&limit=50", { items: [] }),
-  ]);
-
+  const now = await spotify<NowPlaying | Record<string, never>>(
+    "/me/player/currently-playing",
+    {},
+  );
   const nowItem = "item" in now && now.item && now.item.id ? now.item : null;
-  const nowPlaying =
-    nowItem && "is_playing" in now && now.is_playing
-      ? {
-          name: nowItem.name,
-          artists: artistLine(nowItem.artists ?? []),
-          progressMin: roundMin(("progress_ms" in now ? now.progress_ms : 0) ?? 0),
-          durationMin: roundMin(nowItem.duration_ms || 0),
-          progressPct: nowItem.duration_ms
-            ? Math.round((((("progress_ms" in now ? now.progress_ms : 0) ?? 0) / nowItem.duration_ms) * 100))
-            : 0,
-          url: nowItem.external_urls?.spotify ?? null,
-          image: cover(nowItem.album?.images),
-        }
-      : null;
-
-  const savedTrackCount = savedTracks.total ?? 0;
-  const savedAlbumCount = savedAlbums.total ?? 0;
-  const playlistCount = playlists.total ?? 0;
-  const followedCount = following.artists?.total ?? 0;
-  const showCount = shows.total ?? 0;
+  const progress = "progress_ms" in now ? (now.progress_ms ?? 0) : 0;
+  const nowPlaying = nowItem
+    ? {
+        name: nowItem.name,
+        artists: artistLine(nowItem.artists ?? []),
+        paused: !("is_playing" in now && now.is_playing),
+        progressMin: roundMin(progress),
+        durationMin: roundMin(nowItem.duration_ms || 0),
+        progressPct: nowItem.duration_ms
+          ? Math.round((progress / nowItem.duration_ms) * 100)
+          : 0,
+        url: nowItem.external_urls?.spotify ?? null,
+        image: cover(nowItem.album?.images),
+      }
+    : null;
 
   return {
     profile: {
-      name: me.display_name ?? "Spotify",
-      followers: me.followers?.total ?? 0,
-      product: me.product ?? "unknown",
-      url: me.external_urls?.spotify ?? null,
+      name: "Spotify",
+      followers: 0,
+      product: "unknown",
+      url: null,
     },
     nowPlaying,
     library: {
-      savedTracks: savedTrackCount,
-      savedAlbums: savedAlbumCount,
-      playlists: playlistCount,
-      followedArtists: followedCount,
-      shows: showCount,
-      total: savedTrackCount + savedAlbumCount + playlistCount + followedCount + showCount,
+      savedTracks: 0,
+      savedAlbums: 0,
+      playlists: 0,
+      followedArtists: 0,
+      shows: 0,
+      total: 0,
     },
-    recent: buildRecent(recent.items ?? []),
+    recent: emptyRecent(),
     ranges: {
-      short: buildRange("short", shortTracks.items ?? [], shortArtists.items ?? []),
-      medium: buildRange("medium", mediumTracks.items ?? [], mediumArtists.items ?? []),
-      long: buildRange("long", longTracks.items ?? [], longArtists.items ?? []),
+      short: emptyRange("short"),
+      medium: emptyRange("medium"),
+      long: emptyRange("long"),
     },
   };
 }
